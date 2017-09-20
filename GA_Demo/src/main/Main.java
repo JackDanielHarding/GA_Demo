@@ -13,7 +13,7 @@ public class Main {
 	
 	private Entity[] entities;
 	private int generation = 1;
-	private int topFitness = 0;
+	private Entity bestEntity;
 	
 	public void run(){
 		TileMap map = new TileMap(MAP_SIZE);
