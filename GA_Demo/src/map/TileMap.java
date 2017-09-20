@@ -17,11 +17,11 @@ public class TileMap {
 		}
 	}
 	
-	public TileTypes tileFilled(int x, int y){
+	public TileTypes getTile(int x, int y){
 		return tiles[x][y];
 	}
 	
-	public void changeTileState(int x, int y, TileTypes type){
+	public void setTile(int x, int y, TileTypes type){
 		tiles[x][y] = type;
 	}
 	

@@ -3,7 +3,7 @@ import java.util.Random;
 
 import map.TileTypes;
 
-public class PriorityChromesome implements Chromesome{
+public class PriorityChromesome{
 	
 	private TileTypes[] values;
 	private static final int NUM_VALUES = 4;
