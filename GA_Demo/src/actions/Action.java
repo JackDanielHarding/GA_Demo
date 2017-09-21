@@ -1,5 +1,5 @@
 package actions;
 
-public enum Actions {
+public enum Action {
 	NOTHING, RANDOM, TOWARDS, AWAY
 }

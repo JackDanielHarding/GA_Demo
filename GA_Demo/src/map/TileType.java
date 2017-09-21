@@ -1,5 +1,5 @@
 package map;
 
-public enum TileTypes {
+public enum TileType {
 	EMPTY, WALL, ENTITY, FOOD
 }

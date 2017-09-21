@@ -3,7 +3,7 @@ import java.util.Random;
 
 import entities.Entity;
 import map.TileMap;
-import map.TileTypes;
+import map.TileType;
 
 public class Main {
 	
@@ -28,7 +28,7 @@ public class Main {
 			do {
 				x = rand.nextInt(MAP_SIZE);
 				y = rand.nextInt(MAP_SIZE);
-			} while (!map.getTile(x, y).equals(TileTypes.EMPTY));
+			} while (!map.getTile(x, y).equals(TileType.EMPTY));
 			entities[i] = new Entity(x, y);
 		}
 		
@@ -36,12 +36,12 @@ public class Main {
 			do {
 				x = rand.nextInt(MAP_SIZE);
 				y = rand.nextInt(MAP_SIZE);
-			} while (!map.getTile(x, y).equals(TileTypes.EMPTY));
+			} while (!map.getTile(x, y).equals(TileType.EMPTY));
 			//TODO: add Food
 		}
 		
 		for(Entity entity : entities){
-			entity.update(map);
+			entity.getMovement(map);
 		}
 	}
 
