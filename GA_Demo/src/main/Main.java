@@ -2,6 +2,7 @@ package main;
 import java.util.Random;
 
 import entities.Entity;
+import entities.Vector2i;
 import map.TileMap;
 import map.TileType;
 
@@ -29,7 +30,7 @@ public class Main {
 				x = rand.nextInt(MAP_SIZE);
 				y = rand.nextInt(MAP_SIZE);
 			} while (!map.getTile(x, y).equals(TileType.EMPTY));
-			entities[i] = new Entity(x, y);
+			entities[i] = new Entity(new Vector2i(x, y));
 		}
 		
 		for (int i = 0; i < NUM_FOOD; i++){
@@ -41,7 +42,15 @@ public class Main {
 		}
 		
 		for(Entity entity : entities){
-			entity.getMovement(map);
+			Vector2i entityPosition = entity.getPosition();
+			map.setTile(entityPosition.getX(), entityPosition.getY(), TileType.EMPTY);
+			if(!entity.isDead()){
+				Vector2i entityMovement = entity.getMovement(map);
+				map.setTile(entityMovement.getX(), entityMovement.getY(), TileType.ENTITY);
+			}
+			if(entity.getFitness() > bestEntity.getFitness()){
+				bestEntity = entity;
+			}
 		}
 	}
 
