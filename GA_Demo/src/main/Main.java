@@ -1,9 +1,9 @@
 package main;
 
 import java.util.Random;
-import static org.lwjgl.glfw.GLFW.*;
 
-import Display.Window;
+import display.Window;
+
 import entities.Entity;
 import entities.Vector2i;
 import map.TileMap;
@@ -21,19 +21,19 @@ public class Main {
 	
 	TileMap map;
 	
-	private static final int width = 600;
-	private static final int height = 600;
+	private static final int INIT_WIDTH = 600;
+	private static final int INIT_HEIGHT = 600;
 	
 	Window w;
 
 	public void run() {
 		setup();
-		while(!glfwWindowShouldClose(w.getHandle())) loop();
+		while(!w.shouldClose()) loop();
 	}
 
 	public void setup() {
 		
-		w = new Window(width,height);
+		w = new Window(INIT_WIDTH,INIT_HEIGHT);
 
 		map = new TileMap(MAP_SIZE);
 
@@ -49,6 +49,7 @@ public class Main {
 				y = rand.nextInt(MAP_SIZE);
 			} while (!map.getTile(x, y).equals(TileType.EMPTY));
 			entities[i] = new Entity(new Vector2i(x, y));
+			map.setTile(x, y, TileType.ENTITY);
 		}
 
 		for (int i = 0; i < NUM_FOOD; i++) {
@@ -75,6 +76,7 @@ public class Main {
 	public void loop() {
 		
 		w.refresh();
+		map.render(w);
 
 	}
 

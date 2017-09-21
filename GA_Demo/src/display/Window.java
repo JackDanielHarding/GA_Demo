@@ -1,5 +1,6 @@
-package Display;
+package display;
 
+import org.joml.Vector3f;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -17,12 +18,17 @@ public class Window {
 
 	// The window handle
 	private long window;
+	
+	private Renderer r;
+	private int width,height;
 
 	public Window(int width, int height) {
-		init(width, height);
+		this.width = width;
+		this.height = height;
+		init();
 	}
 
-	public void init(int width, int height) {
+	public void init() {
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
 		GLFWErrorCallback.createPrint(System.err).set();
@@ -34,13 +40,15 @@ public class Window {
 		// Configure GLFW
 		glfwDefaultWindowHints(); // optional, the current window hints are already the default
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will be resizable
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
 		// Create the window
 		window = glfwCreateWindow(width, height, "GA DEMO", NULL, NULL);
 		if (window == NULL)
 			throw new RuntimeException("Failed to create the GLFW window");
 
+		
+		
 		// Setup a key callback. It will be called every time a key is pressed, repeated
 		// or released.
 		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
@@ -79,10 +87,20 @@ public class Window {
 		GL.createCapabilities();
 
 		// Set the clear color
-		glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+		r = new Renderer(width,height);
+		
+		// Setup resize callback
+        glfwSetFramebufferSizeCallback(window, (window, width, height) -> {
+            this.width = width;
+            this.height = height;
+            r.resize(width,height);
+            glViewport(0, 0, width, height);
+        });
 	}
 
 	public void destroy() {
+		r.cleanup();
 		// Free the window callbacks and destroy the window
 		glfwFreeCallbacks(window);
 		glfwDestroyWindow(window);
@@ -97,10 +115,28 @@ public class Window {
 	}
 
 	public void refresh() {
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 		glfwSwapBuffers(window);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 		// Poll for window events. The key callback above will only be
 		// invoked during this call.
 		glfwPollEvents();
 	}
+
+	public boolean shouldClose() {
+		return glfwWindowShouldClose(window);
+	}
+
+	public void render(float x, float y, float size, Vector3f color) {
+		r.render( x*width/size,  y*height/size,  width/size,height/size,  color);
+
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
 }

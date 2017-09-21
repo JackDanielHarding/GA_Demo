@@ -1,9 +1,15 @@
 package map;
+
+import display.Window;
+
 public class TileMap {
 	
 	private TileType[][] tiles;
+	private int size;
+	
 	
 	public TileMap(int size){
+		this.size = size;
 		tiles = new TileType[size][size];
 		
 		for(int y = 0; y < size; y++){
@@ -27,5 +33,13 @@ public class TileMap {
 	
 	public TileType[][] getTiles(){
 		return tiles;
+	}
+
+	public void render(Window w) {
+		for(int y = 0; y < size; y++){
+			for(int x = 0; x < size; x++){
+				w.render(x,y,size,tiles[x][y].getColor());
+			}
+		}
 	}
 }
