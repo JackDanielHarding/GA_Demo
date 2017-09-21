@@ -57,6 +57,10 @@ public class Entity {
 		life--;
 		fitness++;
 		
+		if (moveTile == TileType.FOOD){
+			life += 5;
+		}
+		
 		if(life <= 0){
 			dead = true;
 		}

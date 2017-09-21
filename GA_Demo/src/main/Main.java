@@ -38,7 +38,7 @@ public class Main {
 				x = rand.nextInt(MAP_SIZE);
 				y = rand.nextInt(MAP_SIZE);
 			} while (!map.getTile(x, y).equals(TileType.EMPTY));
-			//TODO: add Food
+			map.setTile(x, y, TileType.FOOD);
 		}
 		
 		for(Entity entity : entities){
@@ -53,7 +53,6 @@ public class Main {
 			}
 		}
 	}
-
 	
 	public static void main(String[] args){
 		Main main = new Main();
