@@ -3,6 +3,7 @@ package map;
 
 import display.Window;
 import entities.Entity;
+import logging.Logger;
 
 public class Village {
 
@@ -44,24 +45,30 @@ public class Village {
 	}
 
 	public void update() {
-		if (moveCounter <= 0) {
-			moveEntities();
-			bestEntity = population.getFittest();
-			moveCounter = MOVE_DELAY;
-		}
+		if (!map.getEntities().isEmpty()) {
+			if (moveCounter <= 0) {
+				moveEntities();
+				bestEntity = population.getFittest();
+				moveCounter = MOVE_DELAY;
+			}
 
-		moveCounter--;
+			moveCounter--;
+		} else {
+			Logger.info("Best Entity Chromesomes: ");
+			createNextGeneration();
+		}
 	}
 
 	public void createNextGeneration() {
 		generation++;
+		Logger.info("Generation: " + generation);
+		population = new Population(population);
+		map.spawnPopulation(population);
 	}
 
 	public void moveEntities() {
-		for (Entity entity : population.getEntities()) {
-			if (!entity.isDead()) {
-				entity.move(map);
-			}
+		for (Entity entity : map.getEntities()) {
+			entity.move(map);
 		}
 	}
 }

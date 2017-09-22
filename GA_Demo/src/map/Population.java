@@ -1,26 +1,30 @@
 package map;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import entities.Entity;
 
 public class Population {
 
-	private Entity[] entities;
-	private int index = 0;
+	private List<Entity> entities;
+	private int size;
 
-	public Population(int populationSize) {
-		entities = new Entity[populationSize];
+	public Population(int size) {
+		this.size = size;
+		entities = new ArrayList<>(size);
+	}
+
+	public Population(Population population) {
+		this.size = population.size;
+		entities = new ArrayList<>(size);
+		entities.addAll(population.getFittestArray());
+		breed();
 	}
 
 	public void init() {
-		for (int i = 0; i < entities.length; i++) {
-			entities[i] = new Entity();
-		}
-	}
-
-	public void addEntity(Entity entity) {
-		if (index < entities.length) {
-			entities[index] = entity;
-			index++;
+		for (int i = 0; i < size; i++) {
+			entities.add(new Entity());
 		}
 	}
 
@@ -36,11 +40,27 @@ public class Population {
 		return bestEntity;
 	}
 
-	public int getSize() {
-		return entities.length;
+	public List<Entity> getFittestArray() {
+		List<Entity> fittest = new ArrayList<>();
+		entities.sort();
+		for (int i = 0; i < 4; i++) {
+			fittest.add(entities.remove(0));
+		}
+		return fittest;
 	}
 
-	public Entity[] getEntities() {
+	public void breed() {
+		for (Entity entity : entities) {
+			entity.reset();
+		}
+		// TODO
+	}
+
+	public int getSize() {
+		return size;
+	}
+
+	public List<Entity> getEntities() {
 		return entities;
 	}
 }

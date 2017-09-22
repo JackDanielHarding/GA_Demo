@@ -37,6 +37,7 @@ public class TileMap {
 			Vector2i emptyTileLoc = getEmptyTile();
 			entity.setPosition(emptyTileLoc);
 			setTile(emptyTileLoc, TileType.ENTITY);
+			livingEntities.add(entity);
 		}
 	}
 
@@ -71,6 +72,10 @@ public class TileMap {
 
 	public TileType[][] getTiles() {
 		return tiles;
+	}
+
+	public Set<Entity> getEntities() {
+		return livingEntities;
 	}
 
 	public void render(Window w) {

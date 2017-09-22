@@ -13,13 +13,14 @@ import logging.Logger.Category;
 import map.TileMap;
 import map.TileType;
 
-public class Entity {
+public class Entity implements Comparable<Entity> {
 
+	private static final int INITIAL_LIFE = 10;
 	private Vector2i position;
 	private PriorityChromesome pChromesome;
 	private ReactionChromesome rChromesome;
 	private int fitness = 0;
-	private int life = 10;
+	private int life = INITIAL_LIFE;
 	private boolean dead = false;
 
 	public Entity() {
@@ -47,14 +48,14 @@ public class Entity {
 						reactTile = currentTile;
 						tilePositions.clear();
 					}
-					
-					if (currentTile == reactTile){
+
+					if (currentTile == reactTile) {
 						tilePositions.add(new Vector2i(viewX, viewY));
 					}
 				}
 			}
 		}
-		
+
 		Random rand = new Random();
 		Vector2i reactPosition = tilePositions.get(rand.nextInt(tilePositions.size()));
 
@@ -63,7 +64,8 @@ public class Entity {
 		Action action = rChromesome.getReaction(reactTile);
 		Logger.debug("Reaction: " + action.toString(), Category.ENTITIES);
 
-		Vector2i tileDirection = new Vector2i(reactPosition.getX() - position.getX(), reactPosition.getY() - position.getY());
+		Vector2i tileDirection = new Vector2i(reactPosition.getX() - position.getX(),
+				reactPosition.getY() - position.getY());
 		Logger.debug("Tile Direction: x: " + tileDirection.getX() + ", y: " + tileDirection.getY(), Category.ENTITIES);
 
 		Vector2i movementVector = ActionHandler.useAction(action, tileDirection);
@@ -89,11 +91,16 @@ public class Entity {
 			map.setTile(position.getX(), position.getY(), TileType.ENTITY);
 			Logger.debug(this.toString() + " position: " + position.toString(), Category.ENTITIES);
 		}
-		
+
 		if (life <= 0) {
 			dead = true;
 			map.setTile(position.getX(), position.getY(), TileType.EMPTY);
 		}
+	}
+
+	public void reset() {
+		life = INITIAL_LIFE;
+		fitness = 0;
 	}
 
 	public void setPosition(Vector2i position) {
@@ -111,5 +118,16 @@ public class Entity {
 
 	public boolean isDead() {
 		return dead;
+	}
+
+	@Override
+	public int compareTo(Entity entity) {
+		if (entity.getFitness() > fitness) {
+			return -1;
+		} else if (entity.getFitness() == fitness) {
+			return 0;
+		} else {
+			return 1;
+		}
 	}
 }
