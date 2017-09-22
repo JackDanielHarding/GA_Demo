@@ -1,6 +1,9 @@
 package map;
 
+import java.util.Random;
+
 import display.Window;
+import entities.Vector2i;
 
 public class TileMap {
 
@@ -24,12 +27,33 @@ public class TileMap {
 		}
 	}
 
+	public Vector2i getEmptyTile() {
+		Random rand = new Random();
+		int x;
+		int y;
+
+		do {
+			x = rand.nextInt(size);
+			y = rand.nextInt(size);
+		} while (!getTile(x, y).equals(TileType.EMPTY));
+		return new Vector2i(x, y);
+	}
+
+	public void setEmptyTile(TileType type) {
+		Vector2i emptyTile = getEmptyTile();
+		tiles[emptyTile.getX()][emptyTile.getY()] = type;
+	}
+
 	public TileType getTile(int x, int y) {
 		return tiles[x][y];
 	}
 
 	public void setTile(int x, int y, TileType type) {
 		tiles[x][y] = type;
+	}
+
+	public void setTile(Vector2i tile, TileType type) {
+		setTile(tile.getX(), tile.getY(), type);
 	}
 
 	public TileType[][] getTiles() {
