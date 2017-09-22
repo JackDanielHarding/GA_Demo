@@ -1,5 +1,9 @@
 package entities;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import actions.Action;
 import actions.ActionHandler;
 import chromesomes.PriorityChromesome;
@@ -28,10 +32,9 @@ public class Entity {
 	}
 
 	public void move(TileMap map) {
-		int reactX = 0;
-		int reactY = 0;
 		TileType reactTile = null;
 		TileType currentTile;
+		List<Vector2i> tilePositions = new ArrayList<>();
 
 		for (int viewY = position.getY() - 1; viewY <= position.getY() + 1; viewY++) {
 			for (int viewX = position.getX() - 1; viewX <= position.getX() + 1; viewX++) {
@@ -42,19 +45,25 @@ public class Entity {
 					if ((reactTile == null)
 							|| (pChromesome.getPriority(reactTile) < pChromesome.getPriority(currentTile))) {
 						reactTile = currentTile;
-						reactX = viewX;
-						reactY = viewY;
+						tilePositions.clear();
+					}
+					
+					if (currentTile == reactTile){
+						tilePositions.add(new Vector2i(viewX, viewY));
 					}
 				}
 			}
 		}
+		
+		Random rand = new Random();
+		Vector2i reactPosition = tilePositions.get(rand.nextInt(tilePositions.size()));
 
 		Logger.debug("PriorityTile: " + reactTile.toString(), Category.ENTITIES);
 
 		Action action = rChromesome.getReaction(reactTile);
 		Logger.debug("Reaction: " + action.toString(), Category.ENTITIES);
 
-		Vector2i tileDirection = new Vector2i(reactX - position.getX(), reactY - position.getY());
+		Vector2i tileDirection = new Vector2i(reactPosition.getX() - position.getX(), reactPosition.getY() - position.getY());
 		Logger.debug("Tile Direction: x: " + tileDirection.getX() + ", y: " + tileDirection.getY(), Category.ENTITIES);
 
 		Vector2i movementVector = ActionHandler.useAction(action, tileDirection);
@@ -73,17 +82,17 @@ public class Entity {
 			life += 5;
 		}
 
-		if (life <= 0) {
-			dead = true;
-			map.setTile(position.getX(), position.getY(), TileType.EMPTY);
-		}
-
 		if (moveTile == TileType.EMPTY || moveTile == TileType.FOOD) {
 			map.setTile(position.getX(), position.getY(), TileType.EMPTY);
 			position.setX(movementPosition.getX());
 			position.setY(movementPosition.getY());
 			map.setTile(position.getX(), position.getY(), TileType.ENTITY);
 			Logger.debug(this.toString() + " position: " + position.toString(), Category.ENTITIES);
+		}
+		
+		if (life <= 0) {
+			dead = true;
+			map.setTile(position.getX(), position.getY(), TileType.EMPTY);
 		}
 	}
 

@@ -13,7 +13,7 @@ public class Village {
 	private int generation = 1;
 	private Entity bestEntity;
 
-	TileMap map;
+	private TileMap map;
 
 	private int moveCounter = 0;
 	private static final int MOVE_DELAY = 60;
