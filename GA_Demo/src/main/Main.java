@@ -3,9 +3,9 @@ package main;
 import java.util.Random;
 
 import display.Window;
-
 import entities.Entity;
 import entities.Vector2i;
+import logging.Logger;
 import map.TileMap;
 import map.TileType;
 
@@ -18,24 +18,32 @@ public class Main {
 	private Entity[] entities;
 	private int generation = 1;
 	private Entity bestEntity;
-	
+
 	TileMap map;
-	
+
 	private static final int INIT_WIDTH = 600;
 	private static final int INIT_HEIGHT = 600;
-	
+
 	Window w;
+
+	private int moveCounter = 0;
+	private final static int MOVE_DELAY = 60;
 
 	public void run() {
 		setup();
-		while(!w.shouldClose()) loop();
+		while (!w.shouldClose()) {
+			update();
+			render();
+		}
 	}
 
 	public void setup() {
-		
-		w = new Window(INIT_WIDTH,INIT_HEIGHT);
+		Logger.info("Setup Start");
+
+		w = new Window(INIT_WIDTH, INIT_HEIGHT);
 
 		map = new TileMap(MAP_SIZE);
+		map.setWalls();
 
 		entities = new Entity[NUM_ENTITIES];
 
@@ -59,28 +67,36 @@ public class Main {
 			} while (!map.getTile(x, y).equals(TileType.EMPTY));
 			map.setTile(x, y, TileType.FOOD);
 		}
-		
-		for (Entity entity : entities) {
-			Vector2i entityPosition = entity.getPosition();
-			map.setTile(entityPosition.getX(), entityPosition.getY(), TileType.EMPTY);
-			if (!entity.isDead()) {
-				Vector2i entityMovement = entity.getMovement(map);
-				map.setTile(entityMovement.getX(), entityMovement.getY(), TileType.ENTITY);
-			}
-			if (bestEntity == null || entity.getFitness() > bestEntity.getFitness()) {
-				bestEntity = entity;
-			}
-		}
+		Logger.info("Setup End");
 	}
 
-	public void loop() {
-		
+	public void update() {
+
+		if (moveCounter <= 0) {
+			for (Entity entity : entities) {
+				Vector2i entityPosition = entity.getPosition();
+				map.setTile(entityPosition.getX(), entityPosition.getY(), TileType.EMPTY);
+				if (!entity.isDead()) {
+					Vector2i entityMovement = entity.move(map);
+					map.setTile(entityMovement.getX(), entityMovement.getY(), TileType.ENTITY);
+				}
+				if (bestEntity == null || entity.getFitness() > bestEntity.getFitness()) {
+					bestEntity = entity;
+				}
+			}
+			moveCounter = MOVE_DELAY;
+		}
+
+		moveCounter--;
+	}
+
+	public void render() {
 		w.refresh();
 		map.render(w);
-
 	}
 
 	public static void main(String[] args) {
+		Logger.info("Start");
 		Main main = new Main();
 		main.run();
 	}
