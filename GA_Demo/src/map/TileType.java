@@ -1,7 +1,7 @@
 package map;
 import org.joml.Vector3f;
 public enum TileType {
-	EMPTY(0.0f,0.0f,0.0f), WALL(0.0f,0.5f,0.0f), ENTITY(0.0f,0.0f,0.5f), FOOD(0.5f,0.0f,0.0f);
+	EMPTY(1.0f,1.0f,1.0f), WALL(0.0f,0.0f,0.0f), ENTITY(0.0f,0.0f,0.5f), FOOD(0.5f,0.0f,0.0f);
 	
 	private final Vector3f color;
 	

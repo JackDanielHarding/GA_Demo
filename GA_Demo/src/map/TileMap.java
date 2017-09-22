@@ -63,7 +63,7 @@ public class TileMap {
 	public void render(Window w) {
 		for (int y = 0; y < size; y++) {
 			for (int x = 0; x < size; x++) {
-				w.render(x, y, size, tiles[x][y].getColor());
+				w.renderTile(x, y, size, tiles[x][y]);
 			}
 		}
 	}

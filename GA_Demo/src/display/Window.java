@@ -6,6 +6,8 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
+import map.TileType;
+
 import java.nio.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
@@ -126,9 +128,18 @@ public class Window {
 		return glfwWindowShouldClose(window);
 	}
 
-	public void render(float x, float y, float size, Vector3f color) {
-		r.render( x*width/size,  y*height/size,  width/size,height/size,  color);
-
+	public void renderTile(float x, float y, float size, TileType tile) {
+		switch(tile.name()) {
+		case "FOOD":
+			r.render( (float)(x+0.25)*width/size, (float)(y+0.25)*height/size,  width/(size*2),height/(size*2),  tile.getColor());
+			break;
+		case "ENTITY":
+		case "WALL":
+			r.render( x*width/size,  y*height/size,  width/size,height/size,  tile.getColor());
+			break;
+		case "EMPTY":
+		default:	
+		}
 	}
 
 	public int getWidth() {
