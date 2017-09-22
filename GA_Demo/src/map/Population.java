@@ -11,6 +11,12 @@ public class Population {
 		entities = new Entity[populationSize];
 	}
 
+	public void init() {
+		for (int i = 0; i < entities.length; i++) {
+			entities[i] = new Entity();
+		}
+	}
+
 	public void addEntity(Entity entity) {
 		if (index < entities.length) {
 			entities[index] = entity;

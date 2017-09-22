@@ -18,18 +18,16 @@ public class Entity {
 	private int life = 10;
 	private boolean dead = false;
 
-	public Entity(Vector2i position) {
-		this.position = position;
+	public Entity() {
 		pChromesome = new PriorityChromesome();
 		rChromesome = new ReactionChromesome();
-		Logger.debug(this.toString() + " position: " + position.toString(), Category.ENTITIES);
 	}
 
 	public Entity(Entity parent1, Entity parent2) {
 
 	}
 
-	public Vector2i move(TileMap map) {
+	public void move(TileMap map) {
 		int reactX = 0;
 		int reactY = 0;
 		TileType reactTile = null;
@@ -77,21 +75,21 @@ public class Entity {
 
 		if (life <= 0) {
 			dead = true;
+			map.setTile(position.getX(), position.getY(), TileType.EMPTY);
 		}
 
 		if (moveTile == TileType.EMPTY || moveTile == TileType.FOOD) {
+			map.setTile(position.getX(), position.getY(), TileType.EMPTY);
 			position.setX(movementPosition.getX());
 			position.setY(movementPosition.getY());
+			map.setTile(position.getX(), position.getY(), TileType.ENTITY);
 			Logger.debug(this.toString() + " position: " + position.toString(), Category.ENTITIES);
-			return movementPosition;
-		} else {
-			Logger.debug(this.toString() + " position: " + position.toString(), Category.ENTITIES);
-			return position;
 		}
 	}
 
 	public void setPosition(Vector2i position) {
 		this.position = position;
+		Logger.debug(this.toString() + " position: " + position.toString(), Category.ENTITIES);
 	}
 
 	public Vector2i getPosition() {

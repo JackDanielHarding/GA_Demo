@@ -3,7 +3,6 @@ package map;
 
 import display.Window;
 import entities.Entity;
-import entities.Vector2i;
 
 public class Village {
 
@@ -28,16 +27,10 @@ public class Village {
 	public void setUp() {
 		map.setWalls();
 
-		createInitialPopulation();
-		createInitialFood();
-	}
+		population.init();
+		map.spawnPopulation(population);
 
-	public void createInitialPopulation() {
-		for (int i = 0; i < population.getSize(); i++) {
-			Vector2i emptyTile = map.getEmptyTile();
-			population.addEntity(new Entity(emptyTile));
-			map.setTile(emptyTile, TileType.ENTITY);
-		}
+		createInitialFood();
 	}
 
 	public void createInitialFood() {
@@ -52,20 +45,8 @@ public class Village {
 
 	public void update() {
 		if (moveCounter <= 0) {
-			for (Entity entity : population.getEntities()) {
-				Vector2i entityPosition = entity.getPosition();
-				map.setTile(entityPosition.getX(), entityPosition.getY(), TileType.EMPTY);
-				if (!entity.isDead()) {
-					Vector2i entityMovement = entity.move(map);
-					map.setTile(entityMovement.getX(), entityMovement.getY(), TileType.ENTITY);
-				}
-				if (bestEntity == null || entity.getFitness() > bestEntity.getFitness()) {
-					bestEntity = entity;
-				}
-			}
-
+			moveEntities();
 			bestEntity = population.getFittest();
-
 			moveCounter = MOVE_DELAY;
 		}
 
@@ -74,5 +55,13 @@ public class Village {
 
 	public void createNextGeneration() {
 		generation++;
+	}
+
+	public void moveEntities() {
+		for (Entity entity : population.getEntities()) {
+			if (!entity.isDead()) {
+				entity.move(map);
+			}
+		}
 	}
 }

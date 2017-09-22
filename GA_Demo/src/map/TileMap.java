@@ -1,17 +1,22 @@
 package map;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import display.Window;
+import entities.Entity;
 import entities.Vector2i;
 
 public class TileMap {
 
+	private Set<Entity> livingEntities;
 	private TileType[][] tiles;
 	private int size;
 
 	public TileMap(int size) {
 		this.size = size;
+		livingEntities = new HashSet<>();
 		tiles = new TileType[size][size];
 	}
 
@@ -24,6 +29,14 @@ public class TileMap {
 					tiles[x][y] = TileType.EMPTY;
 				}
 			}
+		}
+	}
+
+	public void spawnPopulation(Population population) {
+		for (Entity entity : population.getEntities()) {
+			Vector2i emptyTileLoc = getEmptyTile();
+			entity.setPosition(emptyTileLoc);
+			setTile(emptyTileLoc, TileType.ENTITY);
 		}
 	}
 
