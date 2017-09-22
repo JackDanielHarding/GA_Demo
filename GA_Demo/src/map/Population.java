@@ -1,6 +1,7 @@
 package map;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import entities.Entity;
@@ -42,7 +43,7 @@ public class Population {
 
 	public List<Entity> getFittestArray() {
 		List<Entity> fittest = new ArrayList<>();
-		entities.sort();
+		Collections.sort(fittest);
 		for (int i = 0; i < 4; i++) {
 			fittest.add(entities.remove(0));
 		}
