@@ -30,7 +30,16 @@ public class PriorityChromesome {
 	}
 
 	public PriorityChromesome(PriorityChromesome parent1, PriorityChromesome parent2) {
+		Random rand = new Random();
+		if (rand.nextBoolean()) {
+			priorities = parent1.getPriorities();
+		} else {
+			priorities = parent2.getPriorities();
+		}
+	}
 
+	public void mutate() {
+		switchPriorities();
 	}
 
 	public void switchPriorities() {
@@ -61,6 +70,10 @@ public class PriorityChromesome {
 
 	public int getPriority(TileType tile) {
 		return priorities.indexOf(tile);
+	}
+
+	public List<TileType> getPriorities() {
+		return priorities;
 	}
 
 	@Override

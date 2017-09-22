@@ -29,7 +29,9 @@ public class Entity implements Comparable<Entity> {
 	}
 
 	public Entity(Entity parent1, Entity parent2) {
-
+		pChromesome = new PriorityChromesome(parent1.getPChromesome(), parent2.getPChromesome());
+		rChromesome = new ReactionChromesome(parent1.getRChromesome(), parent2.getRChromesome());
+		mutate();
 	}
 
 	public void move(TileMap map) {
@@ -98,6 +100,11 @@ public class Entity implements Comparable<Entity> {
 		}
 	}
 
+	private void mutate() {
+		pChromesome.mutate();
+		rChromesome.mutate();
+	}
+
 	public void reset() {
 		life = INITIAL_LIFE;
 		fitness = 0;
@@ -118,6 +125,14 @@ public class Entity implements Comparable<Entity> {
 
 	public boolean isDead() {
 		return dead;
+	}
+
+	public PriorityChromesome getPChromesome() {
+		return pChromesome;
+	}
+
+	public ReactionChromesome getRChromesome() {
+		return rChromesome;
 	}
 
 	@Override

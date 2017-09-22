@@ -31,19 +31,14 @@ public class Population {
 
 	public Entity getFittest() {
 		Entity bestEntity = null;
-
-		for (Entity entity : entities) {
-			if (bestEntity == null || entity.getFitness() > bestEntity.getFitness()) {
-				bestEntity = entity;
-			}
-		}
+		Collections.sort(entities);
 
 		return bestEntity;
 	}
 
 	public List<Entity> getFittestArray() {
 		List<Entity> fittest = new ArrayList<>();
-		Collections.sort(fittest);
+		Collections.sort(entities);
 		for (int i = 0; i < 4; i++) {
 			fittest.add(entities.remove(0));
 		}
@@ -54,7 +49,10 @@ public class Population {
 		for (Entity entity : entities) {
 			entity.reset();
 		}
-		// TODO
+		entities.add(new Entity(entities.get(0), entities.get(1)));
+		entities.add(new Entity(entities.get(1), entities.get(2)));
+		entities.add(new Entity(entities.get(2), entities.get(3)));
+		entities.add(new Entity(entities.get(3), entities.get(0)));
 	}
 
 	public int getSize() {

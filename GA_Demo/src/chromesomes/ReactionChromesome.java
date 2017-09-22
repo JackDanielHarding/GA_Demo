@@ -28,7 +28,22 @@ public class ReactionChromesome {
 	}
 
 	public ReactionChromesome(ReactionChromesome parent1, ReactionChromesome parent2) {
+		TileType[] tiles = TileType.values();
+		reactions = parent1.getReactions();
+		reactions.put(tiles[0], parent2.getReactions().get(tiles[0]));
+		reactions.put(tiles[1], parent2.getReactions().get(tiles[1]));
+	}
 
+	public void mutate() {
+		Random rand = new Random();
+		Action[] actions = Action.values();
+		TileType[] tiles = TileType.values();
+
+		reactions.put(tiles[rand.nextInt(tiles.length)], actions[rand.nextInt(actions.length)]);
+	}
+
+	public Map<TileType, Action> getReactions() {
+		return reactions;
 	}
 
 	public Action getReaction(TileType tile) {

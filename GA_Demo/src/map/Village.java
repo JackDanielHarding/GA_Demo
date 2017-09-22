@@ -12,7 +12,6 @@ public class Village {
 	private Population population;
 
 	private int generation = 1;
-	private Entity bestEntity;
 
 	private TileMap map;
 
@@ -48,7 +47,6 @@ public class Village {
 		if (!map.getEntities().isEmpty()) {
 			if (moveCounter <= 0) {
 				moveEntities();
-				bestEntity = population.getFittest();
 				moveCounter = MOVE_DELAY;
 			}
 
