@@ -30,12 +30,24 @@ public class PriorityChromesome {
 	}
 
 	public PriorityChromesome(PriorityChromesome parent1, PriorityChromesome parent2) {
+		priorities = new ArrayList<>();
 		Random rand = new Random();
-		if (rand.nextBoolean()) {
-			priorities = parent1.getPriorities();
-		} else {
-			priorities = parent2.getPriorities();
-		}
+		do {
+			if (rand.nextBoolean()) {
+				addUniqueTileFromParent(parent1);
+			} else {
+				addUniqueTileFromParent(parent2);
+			}
+		} while (priorities.size() < parent1.getPriorities().size());
+	}
+
+	public void addUniqueTileFromParent(PriorityChromesome parent) {
+		TileType next;
+		int index = 0;
+		do {
+			next = parent.getPriorities().get(index++);
+		} while (priorities.contains(next));
+		priorities.add(next);
 	}
 
 	public void mutate() {

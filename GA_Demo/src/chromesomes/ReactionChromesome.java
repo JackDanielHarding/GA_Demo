@@ -28,6 +28,15 @@ public class ReactionChromesome {
 	}
 
 	public ReactionChromesome(ReactionChromesome parent1, ReactionChromesome parent2) {
+		Random rand = new Random();
+		if (rand.nextBoolean()) {
+			combineReactions(parent1, parent2);
+		} else {
+			combineReactions(parent2, parent1);
+		}
+	}
+
+	private void combineReactions(ReactionChromesome parent1, ReactionChromesome parent2) {
 		TileType[] tiles = TileType.values();
 		reactions = parent1.getReactions();
 		reactions.put(tiles[0], parent2.getReactions().get(tiles[0]));
