@@ -65,8 +65,8 @@ public class Village {
 		if (fittest > fittestEntity) {
 			fittestEntity = fittest;
 		}
-		Logger.info("Fittest Entity of Generation: " + population.getFittest().getFitness());
-		Logger.info("Fittest Entity of all time: " + population.getFittest().getFitness());
+		Logger.info("Fittest Entity of Generation: " + fittest);
+		Logger.info("Fittest Entity of all time: " + fittestEntity);
 		time = 0;
 		generation++;
 		Logger.info("Generation: " + generation);
