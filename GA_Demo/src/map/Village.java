@@ -63,7 +63,7 @@ public class Village {
 		Logger.info("Fittest Entity: " + population.getFittest().getFitness());
 		time = 0;
 		generation++;
-
+		Logger.info("Generation: " + generation);
 		population = new Population(population);
 		map.reset();
 		createInitialFood();
