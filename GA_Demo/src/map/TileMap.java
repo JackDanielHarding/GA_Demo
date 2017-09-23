@@ -97,4 +97,15 @@ public class TileMap {
 			}
 		}
 	}
+
+	public boolean outOfRange(int x, int y) {
+		if ((x < 0 || x >= size) || (y < 0 || y >= size)) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean outOfRange(Vector2i point) {
+		return outOfRange(point.getX(), point.getY());
+	}
 }
