@@ -34,6 +34,7 @@ public class Population {
 	public Entity getFittest() {
 		Entity bestEntity = null;
 		Collections.sort(entities);
+		bestEntity = entities.get(0);
 
 		return bestEntity;
 	}

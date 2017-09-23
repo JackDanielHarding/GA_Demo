@@ -139,11 +139,11 @@ public class Entity implements Comparable<Entity> {
 	@Override
 	public int compareTo(Entity entity) {
 		if (entity.getFitness() > fitness) {
-			return -1;
+			return 1;
 		} else if (entity.getFitness() == fitness) {
 			return 0;
 		} else {
-			return 1;
+			return -1;
 		}
 	}
 }
