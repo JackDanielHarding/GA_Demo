@@ -62,6 +62,15 @@ public class Population {
 		Logger.debug("Entities bred. new entities size is: " + entities.size(), Category.ENTITIES);
 	}
 
+	public float averageFitness() {
+		float averageFitness = 0.0f;
+		for (Entity entity : entities) {
+			averageFitness += entity.getFitness();
+		}
+		averageFitness = averageFitness / entities.size();
+		return averageFitness;
+	}
+
 	public int getSize() {
 		return size;
 	}

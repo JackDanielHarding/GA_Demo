@@ -11,6 +11,7 @@ public class Village {
 
 	private Population population;
 	private int fittestEntity = 0;
+	private float fittestGeneration = 0;
 
 	private int generation = 1;
 	private int time = 0;
@@ -61,13 +62,19 @@ public class Village {
 	}
 
 	public void createNextGeneration() {
-		int fittest = population.getFittest().getFitness();
-		if (fittest > fittestEntity) {
-			fittestEntity = fittest;
+		int fittestGenEntity = population.getFittest().getFitness();
+		if (fittestGenEntity > fittestEntity) {
+			fittestEntity = fittestGenEntity;
+		}
+		float generationFitness = population.averageFitness();
+		if (generationFitness > fittestGeneration) {
+			fittestGeneration = generationFitness;
 		}
 		Logger.info("Generation: " + generation);
-		Logger.info("Fittest Entity of Generation: " + fittest);
+		Logger.info("Fittest Entity of Generation: " + fittestGenEntity);
+		Logger.info("Average Fitness of Generation: " + generationFitness);
 		Logger.info("Fittest Entity of all time: " + fittestEntity);
+		Logger.info("Fittest Generation of all time: " + fittestGeneration);
 		time = 0;
 		generation++;
 		population = new Population(population);
