@@ -10,6 +10,7 @@ public class Village {
 	private int maxFood;
 
 	private Population population;
+	private int fittestEntity = 0;
 
 	private int generation = 1;
 	private int time = 0;
@@ -60,7 +61,12 @@ public class Village {
 	}
 
 	public void createNextGeneration() {
-		Logger.info("Fittest Entity: " + population.getFittest().getFitness());
+		int fittest = population.getFittest().getFitness();
+		if (fittest > fittestEntity) {
+			fittestEntity = fittest;
+		}
+		Logger.info("Fittest Entity of Generation: " + population.getFittest().getFitness());
+		Logger.info("Fittest Entity of all time: " + population.getFittest().getFitness());
 		time = 0;
 		generation++;
 		Logger.info("Generation: " + generation);
