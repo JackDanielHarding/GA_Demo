@@ -96,7 +96,7 @@ public class Entity implements Comparable<Entity> {
 
 		if (life <= 0) {
 			dead = true;
-			map.setTile(position.getX(), position.getY(), TileType.EMPTY);
+			Logger.debug(this + " Died", Category.ENTITIES);
 		}
 	}
 
@@ -108,6 +108,7 @@ public class Entity implements Comparable<Entity> {
 	public void reset() {
 		life = INITIAL_LIFE;
 		fitness = 0;
+		dead = false;
 	}
 
 	public void setPosition(Vector2i position) {

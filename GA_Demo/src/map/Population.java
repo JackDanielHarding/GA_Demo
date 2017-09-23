@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 import entities.Entity;
+import logging.Logger;
+import logging.Logger.Category;
 
 public class Population {
 
@@ -39,20 +41,24 @@ public class Population {
 	public List<Entity> getFittestArray() {
 		List<Entity> fittest = new ArrayList<>();
 		Collections.sort(entities);
-		for (int i = 0; i < 4; i++) {
+		int halfPopulationSize = entities.size() / 2;
+		for (int i = 0; i < halfPopulationSize; i++) {
 			fittest.add(entities.remove(0));
 		}
 		return fittest;
 	}
 
 	public void breed() {
+		int currentPopulationSize = entities.size();
+		for (int i = 0; i < currentPopulationSize - 1; i++) {
+			entities.add(new Entity(entities.get(i), entities.get(i + 1)));
+		}
+		entities.add(new Entity(entities.get(currentPopulationSize - 1), entities.get(0)));
+
 		for (Entity entity : entities) {
 			entity.reset();
 		}
-		entities.add(new Entity(entities.get(0), entities.get(1)));
-		entities.add(new Entity(entities.get(1), entities.get(2)));
-		entities.add(new Entity(entities.get(2), entities.get(3)));
-		entities.add(new Entity(entities.get(3), entities.get(0)));
+		Logger.debug("Entities bred. new entities size is: " + entities.size(), Category.ENTITIES);
 	}
 
 	public int getSize() {

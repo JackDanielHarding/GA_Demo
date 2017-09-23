@@ -1,6 +1,7 @@
 package map;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ public class TileMap {
 		tiles = new TileType[size][size];
 	}
 
-	public void setWalls() {
+	public void reset() {
 		for (int y = 0; y < size; y++) {
 			for (int x = 0; x < size; x++) {
 				if ((x == 0 || x == size - 1) || (y == 0 || y == size - 1)) {
@@ -51,6 +52,17 @@ public class TileMap {
 			y = rand.nextInt(size);
 		} while (!getTile(x, y).equals(TileType.EMPTY));
 		return new Vector2i(x, y);
+	}
+
+	public void moveEntities() {
+		for (Iterator<Entity> iter = livingEntities.iterator(); iter.hasNext();) {
+			Entity entity = iter.next();
+			entity.move(this);
+			if (entity.isDead()) {
+				setTile(entity.getPosition().getX(), entity.getPosition().getY(), TileType.EMPTY);
+				iter.remove();
+			}
+		}
 	}
 
 	public void setEmptyTile(TileType type) {

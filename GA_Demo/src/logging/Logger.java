@@ -49,7 +49,7 @@ public final class Logger {
 	}
 
 	public enum Category {
-		ALL, ENTITIES, CHROMESOMES
+		ALL, ENTITIES, CHROMESOMES, SYSTEM
 	}
 
 	public static void setDebug(boolean debug) {
