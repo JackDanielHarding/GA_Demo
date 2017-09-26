@@ -21,7 +21,7 @@ import map.TileType;
 
 public class Entity implements Comparable<Entity> {
 
-	private static final int INITIAL_LIFE = 10;
+	private static final int INITIAL_LIFE = 15;
 	private static final int FOOD_LIFE = 5;
 	private static final int VIEW_RANGE = 3;
 	private Vector2i position;
