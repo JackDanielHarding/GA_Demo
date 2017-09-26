@@ -1,19 +1,19 @@
-package chromesomes;
+package genetics.chromesomes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import logging.Logger;
 import logging.Logger.Category;
 
-public class OrderChromesome<T extends Enum<T>> {
+public class OrderChromosome<T extends Enum<T>> extends Chromosome {
 
-	private String name;
 	private List<T> list = new ArrayList<>();
 
-	public OrderChromesome(String name, Class<T> enumType) {
-		this.name = name;
+	public OrderChromosome(String name, Class<T> enumType) {
+		super(name);
 		Random rand = new Random();
 		T[] enumValues = enumType.getEnumConstants();
 		T temp;
@@ -28,13 +28,13 @@ public class OrderChromesome<T extends Enum<T>> {
 		Logger.debug(toString(), Category.CHROMESOMES);
 	}
 
-	public OrderChromesome(OrderChromesome<T> orderChromesome) {
-		name = orderChromesome.getName();
+	public OrderChromosome(OrderChromosome<T> orderChromesome) {
+		super(orderChromesome.getName());
 		list.addAll(orderChromesome.getList());
 	}
 
-	public OrderChromesome(OrderChromesome<T> parent1, OrderChromesome<T> parent2) {
-		name = parent1.getName();
+	public OrderChromosome(OrderChromosome<T> parent1, OrderChromosome<T> parent2) {
+		super(parent1.getName());
 		Random rand = new Random();
 		do {
 			if (rand.nextBoolean()) {
@@ -45,7 +45,7 @@ public class OrderChromesome<T extends Enum<T>> {
 		} while (list.size() < parent1.getList().size());
 	}
 
-	public void addUniqueValueFromParent(OrderChromesome<T> parent) {
+	public void addUniqueValueFromParent(OrderChromosome<T> parent) {
 		T next;
 		int index = 0;
 		do {
@@ -54,22 +54,14 @@ public class OrderChromesome<T extends Enum<T>> {
 		list.add(next);
 	}
 
-	public void mutate() {
-		switchPriorities();
-	}
-
 	public void switchPriorities() {
 		Random rand = new Random();
-		int index1 = rand.nextInt(4);
-		T temp = list.get(index1);
-		int index2;
-		if (index1 == list.size() - 1) {
-			index2 = 0;
+		int index = rand.nextInt(4);
+		if (index == list.size() - 1) {
+			Collections.swap(list, index, 0);
 		} else {
-			index2 = index1 + 1;
+			Collections.swap(list, index, index + 1);
 		}
-		list.set(index1, list.get(index2));
-		list.set(index2, temp);
 	}
 
 	public void switchRandomPriorities() {
@@ -79,9 +71,7 @@ public class OrderChromesome<T extends Enum<T>> {
 		do {
 			index2 = rand.nextInt(4);
 		} while (index2 == index1);
-		T temp = list.get(index1);
-		list.set(index1, list.get(index2));
-		list.set(index2, temp);
+		Collections.swap(list, index1, index2);
 	}
 
 	public int getPriority(T value) {
@@ -92,8 +82,9 @@ public class OrderChromesome<T extends Enum<T>> {
 		return list;
 	}
 
-	public String getName() {
-		return name;
+	@Override
+	public void mutate() {
+		switchPriorities();
 	}
 
 	@Override

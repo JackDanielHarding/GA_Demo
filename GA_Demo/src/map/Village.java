@@ -20,7 +20,7 @@ public class Village {
 	private TileMap map;
 
 	private int moveCounter = 0;
-	private static final int MOVE_DELAY = 5;
+	private static final int MOVE_DELAY = 50;
 
 	public Village(int populationSize, int mapSize, int maxFood) {
 		this.maxFood = maxFood;

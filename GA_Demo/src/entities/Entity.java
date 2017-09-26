@@ -10,9 +10,9 @@ import org.joml.Vector2i;
 
 import actions.Action;
 import actions.ActionHandler;
-import chromesomes.AggressionGene;
-import chromesomes.PriorityChromesome;
-import chromesomes.ReactionChromesome;
+import genetics.chromesomes.OrderChromosome;
+import genetics.chromesomes.ReactionChromosome;
+import genetics.genes.BooleanGene;
 import logging.Logger;
 import logging.Logger.Category;
 import map.TileMap;
@@ -24,34 +24,37 @@ public class Entity implements Comparable<Entity> {
 	private static final int FOOD_LIFE = 5;
 	private static final int VIEW_RANGE = 2;
 	private Vector2i position;
-	private PriorityChromesome pChromesome;
-	private ReactionChromesome rChromesome;
-	private AggressionGene aGene;
+	private OrderChromosome<TileType> priorityChrom;
+	private ReactionChromosome reactionChrom;
+	private BooleanGene aggressionGene;
 	private int fitness = 0;
 	private int life = INITIAL_LIFE;
 	private boolean dead = false;
 
 	public Entity() {
-		pChromesome = new PriorityChromesome();
-		rChromesome = new ReactionChromesome();
-		aGene = new AggressionGene();
+		priorityChrom = new OrderChromosome<>("Priority Chromosome", TileType.class);
+		reactionChrom = new ReactionChromosome();
+		aggressionGene = new BooleanGene("Aggression Gene");
 	}
 
 	public Entity(Entity entity) {
-		pChromesome = new PriorityChromesome(entity.getPChromesome());
-		rChromesome = new ReactionChromesome(entity.getRChromesome());
-		aGene = new AggressionGene(entity.getAGene());
+		priorityChrom = new OrderChromosome<>(entity.getPriorityChromosome());
+		reactionChrom = new ReactionChromosome(entity.getReactionsChromosome());
+		aggressionGene = new BooleanGene(entity.getAggressionGene());
 		fitness = entity.getFitness();
 	}
 
 	public Entity(Entity parent1, Entity parent2) {
-		pChromesome = new PriorityChromesome(parent1.getPChromesome(), parent2.getPChromesome());
-		rChromesome = new ReactionChromesome(parent1.getRChromesome(), parent2.getRChromesome());
-		aGene = new AggressionGene(parent1.getAGene(), parent2.getAGene());
+		priorityChrom = new OrderChromosome<>(parent1.getPriorityChromosome(), parent2.getPriorityChromosome());
+		reactionChrom = new ReactionChromosome(parent1.getReactionsChromosome(), parent2.getReactionsChromosome());
+		aggressionGene = new BooleanGene(parent1.getAggressionGene(), parent2.getAggressionGene());
 		mutate();
 	}
 
 	public void move(TileMap map) {
+
+		life--;
+		fitness++;
 
 		TileType currentTile;
 		Map<TileType, List<Vector2i>> tilePositions = new EnumMap<>(TileType.class);
@@ -73,7 +76,7 @@ public class Entity implements Comparable<Entity> {
 		boolean found = false;
 		TileType reactTile = null;
 
-		List<TileType> priorities = pChromesome.getPriorities();
+		List<TileType> priorities = priorityChrom.getList();
 		for (int i = 0; i < priorities.size(); i++) {
 			reactTile = priorities.get(i);
 			List<Vector2i> priorityPositions = tilePositions.get(reactTile);
@@ -90,10 +93,15 @@ public class Entity implements Comparable<Entity> {
 				break;
 			}
 		}
+
+		if (reactPosition == null) {
+			return;
+		}
+
 		Logger.debug("Found Tile: " + found, Category.ENTITIES);
 		Logger.debug("PriorityTile: " + reactTile.toString(), Category.ENTITIES);
 
-		Action action = rChromesome.getReaction(reactTile);
+		Action action = reactionChrom.getReaction(reactTile);
 		Logger.debug("Reaction: " + action.toString(), Category.ENTITIES);
 		Logger.debug("React Position: " + reactPosition, Category.ENTITIES);
 		Logger.debug("Current Position: " + position, Category.ENTITIES);
@@ -108,14 +116,11 @@ public class Entity implements Comparable<Entity> {
 
 		TileType moveTile = map.getTile(movementPosition.x(), movementPosition.y());
 
-		life--;
-		fitness++;
-
 		if (moveTile == TileType.FOOD) {
 			life += FOOD_LIFE;
 		}
 
-		if (moveTile == TileType.ENTITY && aGene.getAggression()) {
+		if (moveTile == TileType.ENTITY && aggressionGene.getValue()) {
 			map.killEntity(movementPosition);
 		} else {
 
@@ -186,8 +191,8 @@ public class Entity implements Comparable<Entity> {
 	}
 
 	private void mutate() {
-		pChromesome.mutate();
-		rChromesome.mutate();
+		priorityChrom.mutate();
+		reactionChrom.mutate();
 	}
 
 	public void reset() {
@@ -213,16 +218,16 @@ public class Entity implements Comparable<Entity> {
 		return dead;
 	}
 
-	public PriorityChromesome getPChromesome() {
-		return pChromesome;
+	public OrderChromosome<TileType> getPriorityChromosome() {
+		return priorityChrom;
 	}
 
-	public ReactionChromesome getRChromesome() {
-		return rChromesome;
+	public ReactionChromosome getReactionsChromosome() {
+		return reactionChrom;
 	}
 
-	public AggressionGene getAGene() {
-		return aGene;
+	public BooleanGene getAggressionGene() {
+		return aggressionGene;
 	}
 
 	@Override
@@ -238,8 +243,8 @@ public class Entity implements Comparable<Entity> {
 
 	public void printStats() {
 		Logger.info("Fitness: " + fitness);
-		Logger.info(pChromesome.toString());
-		Logger.info(rChromesome.toString());
-		Logger.info(aGene.toString());
+		Logger.info(priorityChrom.toString());
+		Logger.info(reactionChrom.toString());
+		Logger.info(aggressionGene.toString());
 	}
 }
