@@ -12,11 +12,9 @@ import map.TileType;
 
 public class ReactionChromesome {
 
-	private Map<TileType, Action> reactions;
+	private Map<TileType, Action> reactions = new EnumMap<>(TileType.class);
 
 	public ReactionChromesome() {
-		reactions = new EnumMap<>(TileType.class);
-
 		Action[] actions = Action.values();
 		TileType[] tiles = TileType.values();
 		Random rand = new Random();
@@ -25,6 +23,10 @@ public class ReactionChromesome {
 		}
 
 		Logger.debug(toString(), Category.CHROMESOMES);
+	}
+
+	public ReactionChromesome(ReactionChromesome reactionChromesome) {
+		reactions.putAll(reactionChromesome.getReactions());
 	}
 
 	public ReactionChromesome(ReactionChromesome parent1, ReactionChromesome parent2) {
@@ -62,6 +64,7 @@ public class ReactionChromesome {
 	@Override
 	public String toString() {
 		StringBuilder outputString = new StringBuilder();
+		outputString.append("Reaction Chromesome: ");
 		for (Entry<TileType, Action> entry : reactions.entrySet()) {
 			outputString.append(", [" + entry.getKey() + ", " + entry.getValue() + "]");
 		}

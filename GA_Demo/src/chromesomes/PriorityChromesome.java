@@ -10,11 +10,9 @@ import map.TileType;
 
 public class PriorityChromesome {
 
-	private List<TileType> priorities;
+	private List<TileType> priorities = new ArrayList<>();
 
 	public PriorityChromesome() {
-		priorities = new ArrayList<>();
-
 		Random rand = new Random();
 		TileType[] tiles = TileType.values();
 		TileType temp;
@@ -27,6 +25,10 @@ public class PriorityChromesome {
 		}
 
 		Logger.debug(toString(), Category.CHROMESOMES);
+	}
+
+	public PriorityChromesome(PriorityChromesome priorityChromesome) {
+		priorities.addAll(priorityChromesome.getPriorities());
 	}
 
 	public PriorityChromesome(PriorityChromesome parent1, PriorityChromesome parent2) {
@@ -91,6 +93,7 @@ public class PriorityChromesome {
 	@Override
 	public String toString() {
 		StringBuilder outputString = new StringBuilder();
+		outputString.append("Priority Chromesome: ");
 		for (TileType tile : priorities) {
 			outputString.append(", " + tile);
 		}

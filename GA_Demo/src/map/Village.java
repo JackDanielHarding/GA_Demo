@@ -2,6 +2,7 @@
 package map;
 
 import display.Window;
+import entities.Entity;
 import logging.Logger;
 import logging.Logger.Category;
 
@@ -10,7 +11,7 @@ public class Village {
 	private int maxFood;
 
 	private Population population;
-	private int fittestEntity = 0;
+	private Entity fittestEntity;
 	private float fittestGeneration = 0;
 
 	private int generation = 1;
@@ -62,9 +63,9 @@ public class Village {
 	}
 
 	public void createNextGeneration() {
-		int fittestGenEntity = population.getFittest().getFitness();
-		if (fittestGenEntity > fittestEntity) {
-			fittestEntity = fittestGenEntity;
+		Entity fittestGenEntity = population.getFittest();
+		if (fittestEntity == null || (fittestGenEntity.getFitness() > fittestEntity.getFitness())) {
+			fittestEntity = new Entity(fittestGenEntity);
 		}
 		float generationFitness = population.averageFitness();
 		if (generationFitness > fittestGeneration) {
@@ -73,7 +74,10 @@ public class Village {
 		Logger.info("Generation: " + generation);
 		Logger.info("Fittest Entity of Generation: " + fittestGenEntity);
 		Logger.info("Average Fitness of Generation: " + generationFitness);
-		Logger.info("Fittest Entity of all time: " + fittestEntity);
+		Logger.info("Fittest Entity of all time: " + fittestEntity.getFitness());
+		Logger.info(fittestEntity.getPChromesome().toString());
+		Logger.info(fittestEntity.getRChromesome().toString());
+		Logger.info(fittestEntity.getAGene().toString());
 		Logger.info("Fittest Generation of all time: " + fittestGeneration);
 		time = 0;
 		generation++;

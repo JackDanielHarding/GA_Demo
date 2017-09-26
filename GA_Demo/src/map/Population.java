@@ -32,7 +32,7 @@ public class Population {
 	}
 
 	public Entity getFittest() {
-		Entity bestEntity = null;
+		Entity bestEntity;
 		Collections.sort(entities);
 		bestEntity = entities.get(0);
 
