@@ -10,9 +10,10 @@ import org.joml.Vector2i;
 
 import actions.Action;
 import actions.ActionHandler;
-import genetics.chromesomes.OrderChromosome;
-import genetics.chromesomes.ReactionChromosome;
-import genetics.genes.BooleanGene;
+import genes.BooleanGene;
+import genes.IntegerGene;
+import genes.OrderGene;
+import genes.ReactionGene;
 import logging.Logger;
 import logging.Logger.Category;
 import map.TileMap;
@@ -22,36 +23,40 @@ public class Entity implements Comparable<Entity> {
 
 	private static final int INITIAL_LIFE = 10;
 	private static final int FOOD_LIFE = 5;
-	private static final int VIEW_RANGE = 2;
+	private static final int VIEW_RANGE = 3;
 	private Vector2i position;
-	private OrderChromosome<TileType> priorityChrom;
-	private ReactionChromosome reactionChrom;
+	private OrderGene<TileType> priorityChrom;
+	private ReactionGene reactionChrom;
 	private BooleanGene aggressionGene;
+	private IntegerGene hungerGene;
 	private int fitness = 0;
 	private int life = INITIAL_LIFE;
 	private boolean dead = false;
 
 	public Entity() {
-		priorityChrom = new OrderChromosome<>("Priority Chromosome", TileType.class);
-		reactionChrom = new ReactionChromosome();
+		priorityChrom = new OrderGene<>("Priority Chromosome", TileType.class);
+		reactionChrom = new ReactionGene();
 		aggressionGene = new BooleanGene("Aggression Gene");
+		hungerGene = new IntegerGene("Hunger Gene", INITIAL_LIFE);
 	}
 
 	public Entity(Entity entity) {
-		priorityChrom = new OrderChromosome<>(entity.getPriorityChromosome());
-		reactionChrom = new ReactionChromosome(entity.getReactionsChromosome());
+		priorityChrom = new OrderGene<>(entity.getPriorityChromosome());
+		reactionChrom = new ReactionGene(entity.getReactionsChromosome());
 		aggressionGene = new BooleanGene(entity.getAggressionGene());
+		hungerGene = new IntegerGene(entity.getHungerGene());
 		fitness = entity.getFitness();
 	}
 
 	public Entity(Entity parent1, Entity parent2) {
-		priorityChrom = new OrderChromosome<>(parent1.getPriorityChromosome(), parent2.getPriorityChromosome());
-		reactionChrom = new ReactionChromosome(parent1.getReactionsChromosome(), parent2.getReactionsChromosome());
+		priorityChrom = new OrderGene<>(parent1.getPriorityChromosome(), parent2.getPriorityChromosome());
+		reactionChrom = new ReactionGene(parent1.getReactionsChromosome(), parent2.getReactionsChromosome());
 		aggressionGene = new BooleanGene(parent1.getAggressionGene(), parent2.getAggressionGene());
+		hungerGene = new IntegerGene(parent1.getHungerGene(), parent2.getHungerGene());
 		mutate();
 	}
 
-	public void move(TileMap map) {
+	public void update(TileMap map) {
 
 		life--;
 		fitness++;
@@ -79,6 +84,9 @@ public class Entity implements Comparable<Entity> {
 		List<TileType> priorities = priorityChrom.getList();
 		for (int i = 0; i < priorities.size(); i++) {
 			reactTile = priorities.get(i);
+			if ((reactTile == TileType.FOOD) && life > hungerGene.getValue()) {
+				continue;
+			}
 			List<Vector2i> priorityPositions = tilePositions.get(reactTile);
 			Collections.shuffle(priorityPositions);
 			for (Vector2i priorityPosition : priorityPositions) {
@@ -118,6 +126,9 @@ public class Entity implements Comparable<Entity> {
 
 		if (moveTile == TileType.FOOD) {
 			life += FOOD_LIFE;
+			if (life > INITIAL_LIFE) {
+				life = INITIAL_LIFE;
+			}
 		}
 
 		if (moveTile == TileType.ENTITY && aggressionGene.getValue()) {
@@ -218,16 +229,24 @@ public class Entity implements Comparable<Entity> {
 		return dead;
 	}
 
-	public OrderChromosome<TileType> getPriorityChromosome() {
+	public OrderGene<TileType> getPriorityChromosome() {
 		return priorityChrom;
 	}
 
-	public ReactionChromosome getReactionsChromosome() {
+	public ReactionGene getReactionsChromosome() {
 		return reactionChrom;
 	}
 
 	public BooleanGene getAggressionGene() {
 		return aggressionGene;
+	}
+
+	public IntegerGene getHungerGene() {
+		return hungerGene;
+	}
+
+	public void kill() {
+		dead = true;
 	}
 
 	@Override
@@ -246,5 +265,6 @@ public class Entity implements Comparable<Entity> {
 		Logger.info(priorityChrom.toString());
 		Logger.info(reactionChrom.toString());
 		Logger.info(aggressionGene.toString());
+		Logger.info(hungerGene.toString());
 	}
 }

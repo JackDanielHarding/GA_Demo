@@ -1,4 +1,4 @@
-package genetics.chromesomes;
+package genes;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -10,11 +10,11 @@ import logging.Logger;
 import logging.Logger.Category;
 import map.TileType;
 
-public class ReactionChromosome {
+public class ReactionGene {
 
 	private Map<TileType, Action> reactions = new EnumMap<>(TileType.class);
 
-	public ReactionChromosome() {
+	public ReactionGene() {
 		Action[] actions = Action.values();
 		TileType[] tiles = TileType.values();
 		Random rand = new Random();
@@ -25,11 +25,11 @@ public class ReactionChromosome {
 		Logger.debug(toString(), Category.CHROMESOMES);
 	}
 
-	public ReactionChromosome(ReactionChromosome reactionChromesome) {
+	public ReactionGene(ReactionGene reactionChromesome) {
 		reactions.putAll(reactionChromesome.getReactions());
 	}
 
-	public ReactionChromosome(ReactionChromosome parent1, ReactionChromosome parent2) {
+	public ReactionGene(ReactionGene parent1, ReactionGene parent2) {
 		Random rand = new Random();
 		if (rand.nextBoolean()) {
 			combineReactions(parent1, parent2);
@@ -38,7 +38,7 @@ public class ReactionChromosome {
 		}
 	}
 
-	private void combineReactions(ReactionChromosome parent1, ReactionChromosome parent2) {
+	private void combineReactions(ReactionGene parent1, ReactionGene parent2) {
 		TileType[] tiles = TileType.values();
 		reactions = parent1.getReactions();
 		reactions.put(tiles[0], parent2.getReactions().get(tiles[0]));

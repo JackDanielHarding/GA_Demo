@@ -61,7 +61,7 @@ public class TileMap {
 		for (Iterator<Entity> iter = livingEntities.iterator(); iter.hasNext();) {
 			Entity entity = iter.next();
 			if (!entity.isDead()) {
-				entity.move(this);
+				entity.update(this);
 			}
 			if (entity.isDead()) {
 				setTile(entity.getPosition(), TileType.EMPTY);
@@ -74,7 +74,7 @@ public class TileMap {
 		for (Iterator<Entity> iter = livingEntities.iterator(); iter.hasNext();) {
 			Entity entity = iter.next();
 			if (entityPosition.equals(entity.getPosition())) {
-				entity.isDead();
+				entity.kill();
 			}
 		}
 		Logger.debug("Entity Killed", Category.ENTITIES);

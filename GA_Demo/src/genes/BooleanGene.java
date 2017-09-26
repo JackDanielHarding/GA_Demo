@@ -1,4 +1,4 @@
-package genetics.genes;
+package genes;
 
 import java.util.Random;
 
@@ -28,6 +28,10 @@ public class BooleanGene {
 		}
 	}
 
+	public void mutate() {
+		value = !value;
+	}
+
 	public Boolean getValue() {
 		return value;
 	}
@@ -38,6 +42,6 @@ public class BooleanGene {
 
 	@Override
 	public String toString() {
-		return "Aggression: " + value;
+		return name + ": " + value;
 	}
 }

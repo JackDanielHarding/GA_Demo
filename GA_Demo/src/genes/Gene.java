@@ -1,10 +1,10 @@
-package genetics.chromesomes;
+package genes;
 
-public abstract class Chromosome {
+public abstract class Gene {
 
 	protected String name;
 
-	public Chromosome(String name) {
+	public Gene(String name) {
 		this.name = name;
 	}
 

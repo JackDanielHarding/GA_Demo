@@ -4,14 +4,14 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import genetics.chromesomes.OrderChromosome;
+import genes.OrderGene;
 
 public class OrderChromesomeTest {
 
 	@Test
 	public void createOrderChromosomeTest() {
 		String name = "Test Chromesome";
-		OrderChromosome<TestEnum> oChrom = new OrderChromosome<>(name, TestEnum.class);
+		OrderGene<TestEnum> oChrom = new OrderGene<>(name, TestEnum.class);
 
 		assertEquals(oChrom.getName(), name);
 	}

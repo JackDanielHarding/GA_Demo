@@ -1,4 +1,4 @@
-package genetics.chromesomes;
+package genes;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,11 +8,11 @@ import java.util.Random;
 import logging.Logger;
 import logging.Logger.Category;
 
-public class OrderChromosome<T extends Enum<T>> extends Chromosome {
+public class OrderGene<T extends Enum<T>> extends Gene {
 
 	private List<T> list = new ArrayList<>();
 
-	public OrderChromosome(String name, Class<T> enumType) {
+	public OrderGene(String name, Class<T> enumType) {
 		super(name);
 		Random rand = new Random();
 		T[] enumValues = enumType.getEnumConstants();
@@ -28,12 +28,12 @@ public class OrderChromosome<T extends Enum<T>> extends Chromosome {
 		Logger.debug(toString(), Category.CHROMESOMES);
 	}
 
-	public OrderChromosome(OrderChromosome<T> orderChromesome) {
+	public OrderGene(OrderGene<T> orderChromesome) {
 		super(orderChromesome.getName());
 		list.addAll(orderChromesome.getList());
 	}
 
-	public OrderChromosome(OrderChromosome<T> parent1, OrderChromosome<T> parent2) {
+	public OrderGene(OrderGene<T> parent1, OrderGene<T> parent2) {
 		super(parent1.getName());
 		Random rand = new Random();
 		do {
@@ -45,7 +45,7 @@ public class OrderChromosome<T extends Enum<T>> extends Chromosome {
 		} while (list.size() < parent1.getList().size());
 	}
 
-	public void addUniqueValueFromParent(OrderChromosome<T> parent) {
+	public void addUniqueValueFromParent(OrderGene<T> parent) {
 		T next;
 		int index = 0;
 		do {
