@@ -19,6 +19,9 @@ public class Village {
 
 	private TileMap map;
 
+	private static final int FOOD_DELAY = 1;
+	private int foodCounter = FOOD_DELAY;
+
 	private int moveCounter = 0;
 	private static final int MOVE_DELAY = 50;
 
@@ -53,10 +56,18 @@ public class Village {
 				time++;
 				Logger.debug("Time: " + time, Category.SYSTEM);
 				map.moveEntities();
+
+				foodCounter--;
+				if (foodCounter <= 0) {
+					map.setEmptyTile(TileType.FOOD);
+					foodCounter = FOOD_DELAY;
+				}
+
 				moveCounter = MOVE_DELAY;
 			}
 
 			moveCounter--;
+
 		} else {
 			createNextGeneration();
 		}
