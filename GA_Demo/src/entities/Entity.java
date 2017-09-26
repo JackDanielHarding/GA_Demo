@@ -235,4 +235,11 @@ public class Entity implements Comparable<Entity> {
 			return -1;
 		}
 	}
+
+	public void printStats() {
+		Logger.info("Fitness: " + fitness);
+		Logger.info(pChromesome.toString());
+		Logger.info(rChromesome.toString());
+		Logger.info(aGene.toString());
+	}
 }

@@ -72,12 +72,10 @@ public class Village {
 			fittestGeneration = generationFitness;
 		}
 		Logger.info("Generation: " + generation);
-		Logger.info("Fittest Entity of Generation: " + fittestGenEntity);
+		Logger.info("Fittest Entity of Generation: " + fittestGenEntity.getFitness());
 		Logger.info("Average Fitness of Generation: " + generationFitness);
-		Logger.info("Fittest Entity of all time: " + fittestEntity.getFitness());
-		Logger.info(fittestEntity.getPChromesome().toString());
-		Logger.info(fittestEntity.getRChromesome().toString());
-		Logger.info(fittestEntity.getAGene().toString());
+		Logger.info("Fittest Entity of all time:");
+		fittestEntity.printStats();
 		Logger.info("Fittest Generation of all time: " + fittestGeneration);
 		time = 0;
 		generation++;
