@@ -23,6 +23,7 @@ public class Window {
 	private Renderer r;
 	private int width, height;
 	private boolean vsync = true;
+	private long counter = 10;
 
 	public Window(int width, int height) {
 		this.width = width;
@@ -120,10 +121,10 @@ public class Window {
 	}
 
 	public void refresh() {
-		if(glfwGetKey(window, GLFW_KEY_V) == 1) {
+		if(glfwGetKey(window, GLFW_KEY_V) == 1 && counter <= System.currentTimeMillis()) {
 			vsync = !vsync;
 			glfwSwapInterval(vsync?1:0);
-			
+			counter = System.currentTimeMillis()+200;
 		}
 		glfwSwapBuffers(window);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the
