@@ -25,8 +25,8 @@ public class Entity implements Comparable<Entity> {
 	private static final int FOOD_LIFE = 5;
 	private static final int VIEW_RANGE = 3;
 	private Vector2i position;
-	private OrderGene<TileType> priorityChrom;
-	private ReactionGene reactionChrom;
+	private OrderGene<TileType> priorityGene;
+	private ReactionGene reactionGene;
 	private BooleanGene aggressionGene;
 	private IntegerGene hungerGene;
 	private int fitness = 0;
@@ -34,23 +34,23 @@ public class Entity implements Comparable<Entity> {
 	private boolean dead = false;
 
 	public Entity() {
-		priorityChrom = new OrderGene<>("Priority Chromosome", TileType.class);
-		reactionChrom = new ReactionGene();
+		priorityGene = new OrderGene<>("Priority Chromosome", TileType.class);
+		reactionGene = new ReactionGene();
 		aggressionGene = new BooleanGene("Aggression Gene");
 		hungerGene = new IntegerGene("Hunger Gene", INITIAL_LIFE);
 	}
 
 	public Entity(Entity entity) {
-		priorityChrom = new OrderGene<>(entity.getPriorityChromosome());
-		reactionChrom = new ReactionGene(entity.getReactionsChromosome());
+		priorityGene = new OrderGene<>(entity.getPriorityChromosome());
+		reactionGene = new ReactionGene(entity.getReactionsChromosome());
 		aggressionGene = new BooleanGene(entity.getAggressionGene());
 		hungerGene = new IntegerGene(entity.getHungerGene());
 		fitness = entity.getFitness();
 	}
 
 	public Entity(Entity parent1, Entity parent2) {
-		priorityChrom = new OrderGene<>(parent1.getPriorityChromosome(), parent2.getPriorityChromosome());
-		reactionChrom = new ReactionGene(parent1.getReactionsChromosome(), parent2.getReactionsChromosome());
+		priorityGene = new OrderGene<>(parent1.getPriorityChromosome(), parent2.getPriorityChromosome());
+		reactionGene = new ReactionGene(parent1.getReactionsChromosome(), parent2.getReactionsChromosome());
 		aggressionGene = new BooleanGene(parent1.getAggressionGene(), parent2.getAggressionGene());
 		hungerGene = new IntegerGene(parent1.getHungerGene(), parent2.getHungerGene());
 		mutate();
@@ -81,7 +81,7 @@ public class Entity implements Comparable<Entity> {
 		boolean found = false;
 		TileType reactTile = null;
 
-		List<TileType> priorities = priorityChrom.getList();
+		List<TileType> priorities = priorityGene.getList();
 		for (int i = 0; i < priorities.size(); i++) {
 			reactTile = priorities.get(i);
 			if ((reactTile == TileType.FOOD) && life > hungerGene.getValue()) {
@@ -109,7 +109,7 @@ public class Entity implements Comparable<Entity> {
 		Logger.debug("Found Tile: " + found, Category.ENTITIES);
 		Logger.debug("PriorityTile: " + reactTile.toString(), Category.ENTITIES);
 
-		Action action = reactionChrom.getReaction(reactTile);
+		Action action = reactionGene.getReaction(reactTile);
 		Logger.debug("Reaction: " + action.toString(), Category.ENTITIES);
 		Logger.debug("React Position: " + reactPosition, Category.ENTITIES);
 		Logger.debug("Current Position: " + position, Category.ENTITIES);
@@ -202,8 +202,10 @@ public class Entity implements Comparable<Entity> {
 	}
 
 	private void mutate() {
-		priorityChrom.mutate();
-		reactionChrom.mutate();
+		priorityGene.mutate();
+		reactionGene.mutate();
+		aggressionGene.mutate();
+		hungerGene.mutate();
 	}
 
 	public void reset() {
@@ -230,11 +232,11 @@ public class Entity implements Comparable<Entity> {
 	}
 
 	public OrderGene<TileType> getPriorityChromosome() {
-		return priorityChrom;
+		return priorityGene;
 	}
 
 	public ReactionGene getReactionsChromosome() {
-		return reactionChrom;
+		return reactionGene;
 	}
 
 	public BooleanGene getAggressionGene() {
@@ -262,8 +264,8 @@ public class Entity implements Comparable<Entity> {
 
 	public void printStats() {
 		Logger.info("Fitness: " + fitness);
-		Logger.info(priorityChrom.toString());
-		Logger.info(reactionChrom.toString());
+		Logger.info(priorityGene.toString());
+		Logger.info(reactionGene.toString());
 		Logger.info(aggressionGene.toString());
 		Logger.info(hungerGene.toString());
 	}

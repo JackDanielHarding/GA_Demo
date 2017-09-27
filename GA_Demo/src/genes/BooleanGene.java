@@ -2,24 +2,23 @@ package genes;
 
 import java.util.Random;
 
-public class BooleanGene {
+public class BooleanGene extends Gene {
 
-	private String name;
 	private boolean value;
 
 	public BooleanGene(String name) {
-		this.name = name;
+		super(name);
 		Random rand = new Random();
 		value = rand.nextBoolean();
 	}
 
 	public BooleanGene(BooleanGene gene) {
-		name = gene.getName();
+		super(gene.getName());
 		value = gene.getValue();
 	}
 
 	public BooleanGene(BooleanGene parent1, BooleanGene parent2) {
-		name = parent1.getName();
+		super(parent1.getName());
 		Random rand = new Random();
 		if (rand.nextBoolean()) {
 			value = parent1.getValue();
@@ -28,16 +27,13 @@ public class BooleanGene {
 		}
 	}
 
+	@Override
 	public void mutate() {
 		value = !value;
 	}
 
 	public Boolean getValue() {
 		return value;
-	}
-
-	public String getName() {
-		return name;
 	}
 
 	@Override

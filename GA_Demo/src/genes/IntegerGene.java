@@ -2,14 +2,13 @@ package genes;
 
 import java.util.Random;
 
-public class IntegerGene {
+public class IntegerGene extends Gene {
 
-	private String name;
 	private int value;
 	private int valueCap;
 
 	public IntegerGene(String name, int valueCap) {
-		this.name = name;
+		super(name);
 		this.valueCap = valueCap;
 
 		Random rand = new Random();
@@ -17,13 +16,13 @@ public class IntegerGene {
 	}
 
 	public IntegerGene(IntegerGene gene) {
-		name = gene.name;
+		super(gene.name);
 		value = gene.value;
 		valueCap = gene.valueCap;
 	}
 
 	public IntegerGene(IntegerGene parent1, IntegerGene parent2) {
-		name = parent1.name;
+		super(parent1.name);
 		valueCap = parent1.valueCap;
 		int midpoint = Math.abs(parent1.value - parent2.value) / 2;
 		if (parent1.value < parent2.value) {
@@ -33,6 +32,7 @@ public class IntegerGene {
 		}
 	}
 
+	@Override
 	public void mutate() {
 		if (value == 0) {
 			value++;
@@ -50,10 +50,6 @@ public class IntegerGene {
 
 	public int getValue() {
 		return value;
-	}
-
-	public String getName() {
-		return name;
 	}
 
 	@Override
