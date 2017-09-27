@@ -2,7 +2,7 @@ package genes;
 
 import java.util.Random;
 
-public class BooleanGene extends Gene {
+public class BooleanGene extends Gene<Boolean> {
 
 	private boolean value;
 
@@ -32,6 +32,7 @@ public class BooleanGene extends Gene {
 		value = !value;
 	}
 
+	@Override
 	public Boolean getValue() {
 		return value;
 	}

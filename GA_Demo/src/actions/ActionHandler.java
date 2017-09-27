@@ -6,7 +6,6 @@ public abstract class ActionHandler {
 
 	public static Vector2i useAction(Action action, Vector2i direction) {
 		switch (action) {
-		case RANDOM:
 		case TOWARDS:
 			return direction;
 		case AWAY:

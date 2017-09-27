@@ -19,11 +19,11 @@ public class Village {
 
 	private TileMap map;
 
-	private static final int FOOD_DELAY = 1;
+	private static final int FOOD_DELAY = 5;
 	private int foodCounter = FOOD_DELAY;
 
 	private int moveCounter = 0;
-	private static final int MOVE_DELAY = 50;
+	private static final int MOVE_DELAY = 25;
 
 	public Village(int populationSize, int mapSize, int maxFood) {
 		this.maxFood = maxFood;
@@ -83,7 +83,8 @@ public class Village {
 			fittestGeneration = generationFitness;
 		}
 		Logger.info("Generation: " + generation);
-		Logger.info("Fittest Entity of Generation: " + fittestGenEntity.getFitness());
+		Logger.info("Fittest Entity of Generation: ");
+		fittestGenEntity.printStats();
 		Logger.info("Average Fitness of Generation: " + generationFitness);
 		Logger.info("Fittest Entity of all time:");
 		fittestEntity.printStats();

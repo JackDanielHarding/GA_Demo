@@ -8,7 +8,7 @@ import java.util.Random;
 import logging.Logger;
 import logging.Logger.Category;
 
-public class OrderGene<T extends Enum<T>> extends Gene {
+public class OrderGene<T extends Enum<T>> extends Gene<List<T>> {
 
 	private List<T> list = new ArrayList<>();
 
@@ -30,7 +30,7 @@ public class OrderGene<T extends Enum<T>> extends Gene {
 
 	public OrderGene(OrderGene<T> orderChromesome) {
 		super(orderChromesome.getName());
-		list.addAll(orderChromesome.getList());
+		list.addAll(orderChromesome.getValue());
 	}
 
 	public OrderGene(OrderGene<T> parent1, OrderGene<T> parent2) {
@@ -42,14 +42,14 @@ public class OrderGene<T extends Enum<T>> extends Gene {
 			} else {
 				addUniqueValueFromParent(parent2);
 			}
-		} while (list.size() < parent1.getList().size());
+		} while (list.size() < parent1.getValue().size());
 	}
 
 	public void addUniqueValueFromParent(OrderGene<T> parent) {
 		T next;
 		int index = 0;
 		do {
-			next = parent.getList().get(index++);
+			next = parent.getValue().get(index++);
 		} while (list.contains(next));
 		list.add(next);
 	}
@@ -78,7 +78,8 @@ public class OrderGene<T extends Enum<T>> extends Gene {
 		return list.indexOf(value);
 	}
 
-	public List<T> getList() {
+	@Override
+	public List<T> getValue() {
 		return list;
 	}
 

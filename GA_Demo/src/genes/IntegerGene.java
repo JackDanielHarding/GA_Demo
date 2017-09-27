@@ -2,7 +2,7 @@ package genes;
 
 import java.util.Random;
 
-public class IntegerGene extends Gene {
+public class IntegerGene extends Gene<Integer> {
 
 	private int value;
 	private int valueCap;
@@ -48,7 +48,8 @@ public class IntegerGene extends Gene {
 		}
 	}
 
-	public int getValue() {
+	@Override
+	public Integer getValue() {
 		return value;
 	}
 
