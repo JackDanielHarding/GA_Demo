@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.joml.Vector2i;
 
@@ -24,6 +25,7 @@ public class Entity implements Comparable<Entity> {
 	private static final int INITIAL_LIFE = 15;
 	private static final int FOOD_LIFE = 5;
 	private static final int VIEW_RANGE = 3;
+	private static final float MUTATION_RATE = 0.05f;
 	private Vector2i position;
 	private OrderGene<TileType> priorityGene;
 	private ReactionGene reactionGene;
@@ -202,10 +204,16 @@ public class Entity implements Comparable<Entity> {
 	}
 
 	private void mutate() {
-		priorityGene.mutate();
-		reactionGene.mutate();
-		aggressionGene.mutate();
-		hungerGene.mutate();
+		Random random = new Random();
+
+		if (random.nextFloat() <= MUTATION_RATE)
+			priorityGene.mutate();
+		if (random.nextFloat() <= MUTATION_RATE)
+			reactionGene.mutate();
+		if (random.nextFloat() <= MUTATION_RATE)
+			aggressionGene.mutate();
+		if (random.nextFloat() <= MUTATION_RATE)
+			hungerGene.mutate();
 	}
 
 	public void reset() {
