@@ -1,16 +1,12 @@
 package entities;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.joml.Vector2i;
 
 import actions.Action;
-import actions.ActionHandler;
 import genes.BooleanGene;
 import genes.IntegerGene;
 import genes.MapGene;
@@ -34,6 +30,9 @@ public class Entity implements Comparable<Entity> {
 	private int fitness = 0;
 	private int life = INITIAL_LIFE;
 	private boolean dead = false;
+
+	private Vector2i nextMovement;
+	private TileType[] sight = new TileType[((VIEW_RANGE * 2 + 1) ^ 2) - 1];
 
 	public Entity() {
 		priorityGene = new OrderGene<>("Priority Gene", TileType.class);
@@ -63,66 +62,7 @@ public class Entity implements Comparable<Entity> {
 		life--;
 		fitness++;
 
-		TileType currentTile;
-		Map<TileType, List<Vector2i>> tilePositions = new EnumMap<>(TileType.class);
-		for (TileType type : TileType.values()) {
-			tilePositions.put(type, new ArrayList<Vector2i>());
-		}
-
-		for (int viewY = position.y() - VIEW_RANGE; viewY <= position.y() + VIEW_RANGE; viewY++) {
-			for (int viewX = position.x() - VIEW_RANGE; viewX <= position.x() + VIEW_RANGE; viewX++) {
-				if ((!(viewX == position.x() && viewY == position.y())) && !map.outOfRange(viewX, viewY)) {
-					currentTile = map.getTile(viewX, viewY);
-					List<Vector2i> tileList = tilePositions.get(currentTile);
-					tileList.add(new Vector2i(viewX, viewY));
-				}
-			}
-		}
-
-		Vector2i reactPosition = new Vector2i(0, 0);
-		boolean found = false;
-		TileType reactTile = null;
-
-		List<TileType> priorities = priorityGene.getValue();
-		for (int i = 0; i < priorities.size(); i++) {
-			reactTile = priorities.get(i);
-			if ((reactTile == TileType.FOOD) && life > hungerGene.getValue()) {
-				continue;
-			}
-			List<Vector2i> priorityPositions = tilePositions.get(reactTile);
-			Collections.shuffle(priorityPositions);
-			for (Vector2i priorityPosition : priorityPositions) {
-				Logger.debug("Checking Position: " + priorityPosition, Category.ENTITIES);
-				reactPosition = inSight(map, priorityPosition);
-				if (reactPosition != null) {
-					found = true;
-					break;
-				}
-			}
-			if (found) {
-				break;
-			}
-		}
-
-		if (reactPosition == null) {
-			return;
-		}
-
-		Logger.debug("Found Tile: " + found, Category.ENTITIES);
-		Logger.debug("PriorityTile: " + reactTile.toString(), Category.ENTITIES);
-
-		Action action = reactionGene.getSmallValue(reactTile);
-		Logger.debug("Reaction: " + action.toString(), Category.ENTITIES);
-		Logger.debug("React Position: " + reactPosition, Category.ENTITIES);
-		Logger.debug("Current Position: " + position, Category.ENTITIES);
-
-		Vector2i tileDirection = new Vector2i(reactPosition.x() - position.x(), reactPosition.y() - position.y());
-		Logger.debug("Tile Direction: " + tileDirection, Category.ENTITIES);
-
-		Vector2i movementVector = ActionHandler.useAction(action, tileDirection);
-		Logger.debug("Movement Direction: " + movementVector, Category.ENTITIES);
-
-		Vector2i movementPosition = new Vector2i(position.x() + movementVector.x(), position.y() + movementVector.y());
+		Vector2i movementPosition = new Vector2i(position.x() + nextMovement.x(), position.y() + nextMovement.y());
 
 		TileType moveTile = map.getTile(movementPosition.x(), movementPosition.y());
 
@@ -149,6 +89,26 @@ public class Entity implements Comparable<Entity> {
 		if (life <= 0) {
 			dead = true;
 			Logger.debug(this + " Died", Category.ENTITIES);
+		} else {
+			int sightIndexX = 0;
+			int sightIndexY = 0;
+
+			for (int viewY = position.y() - VIEW_RANGE; viewY <= position.y() + VIEW_RANGE; viewY++) {
+				sightIndexX = 0;
+				for (int viewX = position.x() - VIEW_RANGE; viewX <= position.x() + VIEW_RANGE; viewX++) {
+					if ((!(viewX == position.x() && viewY == position.y()))) {
+						if (map.outOfRange(viewX, viewY)) {
+							sight[sightIndexX][sightIndexY] = TileType.UNKNOWN;
+						} else {
+							sight[sightIndexX][sightIndexY] = map.getTile(viewX, viewY);
+						}
+					} else {
+						sight[sightIndexX][sightIndexY] = TileType.SELF;
+					}
+					sightIndexX++;
+				}
+				sightIndexY++;
+			}
 		}
 	}
 
@@ -276,5 +236,13 @@ public class Entity implements Comparable<Entity> {
 		Logger.info(reactionGene.toString());
 		Logger.info(aggressionGene.toString());
 		Logger.info(hungerGene.toString());
+	}
+
+	public void setNextMovement(Vector2i nextMovement) {
+		this.nextMovement = nextMovement;
+	}
+
+	public TileType[] getSight() {
+		return sight;
 	}
 }
