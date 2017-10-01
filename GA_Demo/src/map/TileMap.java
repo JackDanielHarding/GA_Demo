@@ -5,9 +5,12 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
+import org.joml.Vector2i;
+
 import display.Window;
 import entities.Entity;
-import entities.Vector2i;
+import logging.Logger;
+import logging.Logger.Category;
 
 public class TileMap {
 
@@ -57,17 +60,29 @@ public class TileMap {
 	public void moveEntities() {
 		for (Iterator<Entity> iter = livingEntities.iterator(); iter.hasNext();) {
 			Entity entity = iter.next();
-			entity.move(this);
+			if (!entity.isDead()) {
+				entity.update(this);
+			}
 			if (entity.isDead()) {
-				setTile(entity.getPosition().getX(), entity.getPosition().getY(), TileType.EMPTY);
+				setTile(entity.getPosition(), TileType.EMPTY);
 				iter.remove();
 			}
 		}
 	}
 
+	public void killEntity(Vector2i entityPosition) {
+		for (Iterator<Entity> iter = livingEntities.iterator(); iter.hasNext();) {
+			Entity entity = iter.next();
+			if (entityPosition.equals(entity.getPosition())) {
+				entity.kill();
+			}
+		}
+		Logger.debug("Entity Killed", Category.ENTITIES);
+	}
+
 	public void setEmptyTile(TileType type) {
 		Vector2i emptyTile = getEmptyTile();
-		tiles[emptyTile.getX()][emptyTile.getY()] = type;
+		tiles[emptyTile.x()][emptyTile.y()] = type;
 	}
 
 	public TileType getTile(int x, int y) {
@@ -79,7 +94,7 @@ public class TileMap {
 	}
 
 	public void setTile(Vector2i tile, TileType type) {
-		setTile(tile.getX(), tile.getY(), type);
+		setTile(tile.x(), tile.y(), type);
 	}
 
 	public TileType[][] getTiles() {
@@ -106,6 +121,6 @@ public class TileMap {
 	}
 
 	public boolean outOfRange(Vector2i point) {
-		return outOfRange(point.getX(), point.getY());
+		return outOfRange(point.x(), point.y());
 	}
 }

@@ -5,11 +5,16 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import org.joml.Vector2i;
 
 import actions.Action;
 import actions.ActionHandler;
-import chromesomes.PriorityChromesome;
-import chromesomes.ReactionChromesome;
+import genes.BooleanGene;
+import genes.IntegerGene;
+import genes.MapGene;
+import genes.OrderGene;
 import logging.Logger;
 import logging.Logger.Category;
 import map.TileMap;
@@ -17,37 +22,56 @@ import map.TileType;
 
 public class Entity implements Comparable<Entity> {
 
-	private static final int INITIAL_LIFE = 10;
+	private static final int INITIAL_LIFE = 15;
 	private static final int FOOD_LIFE = 5;
-	private static final int VIEW_RANGE = 2;
+	private static final int VIEW_RANGE = 5;
+	private static final float MUTATION_RATE = 0.05f;
 	private Vector2i position;
-	private PriorityChromesome pChromesome;
-	private ReactionChromesome rChromesome;
+	private OrderGene<TileType> priorityGene;
+	private MapGene<TileType, Action> reactionGene;
+	private BooleanGene aggressionGene;
+	private IntegerGene hungerGene;
 	private int fitness = 0;
 	private int life = INITIAL_LIFE;
 	private boolean dead = false;
 
 	public Entity() {
-		pChromesome = new PriorityChromesome();
-		rChromesome = new ReactionChromesome();
+		priorityGene = new OrderGene<>("Priority Gene", TileType.class);
+		reactionGene = new MapGene<>("Reaction Gene", TileType.class, Action.class);
+		aggressionGene = new BooleanGene("Aggression Gene");
+		hungerGene = new IntegerGene("Hunger Gene", INITIAL_LIFE);
+	}
+
+	public Entity(Entity entity) {
+		priorityGene = new OrderGene<>(entity.getPriorityChromosome());
+		reactionGene = new MapGene<>(entity.getReactionsChromosome());
+		aggressionGene = new BooleanGene(entity.getAggressionGene());
+		hungerGene = new IntegerGene(entity.getHungerGene());
+		fitness = entity.getFitness();
 	}
 
 	public Entity(Entity parent1, Entity parent2) {
-		pChromesome = new PriorityChromesome(parent1.getPChromesome(), parent2.getPChromesome());
-		rChromesome = new ReactionChromesome(parent1.getRChromesome(), parent2.getRChromesome());
+		priorityGene = new OrderGene<>(parent1.getPriorityChromosome(), parent2.getPriorityChromosome());
+		reactionGene = new MapGene<>(parent1.getReactionsChromosome(), parent2.getReactionsChromosome());
+		aggressionGene = new BooleanGene(parent1.getAggressionGene(), parent2.getAggressionGene());
+		hungerGene = new IntegerGene(parent1.getHungerGene(), parent2.getHungerGene());
 		mutate();
 	}
 
-	public void move(TileMap map) {
+	public void update(TileMap map) {
+
+		life--;
+		fitness++;
+
 		TileType currentTile;
 		Map<TileType, List<Vector2i>> tilePositions = new EnumMap<>(TileType.class);
 		for (TileType type : TileType.values()) {
 			tilePositions.put(type, new ArrayList<Vector2i>());
 		}
 
-		for (int viewY = position.getY() - VIEW_RANGE; viewY <= position.getY() + VIEW_RANGE; viewY++) {
-			for (int viewX = position.getX() - VIEW_RANGE; viewX <= position.getX() + VIEW_RANGE; viewX++) {
-				if ((!(viewX == position.getX() && viewY == position.getY())) && !map.outOfRange(viewX, viewY)) {
+		for (int viewY = position.y() - VIEW_RANGE; viewY <= position.y() + VIEW_RANGE; viewY++) {
+			for (int viewX = position.x() - VIEW_RANGE; viewX <= position.x() + VIEW_RANGE; viewX++) {
+				if ((!(viewX == position.x() && viewY == position.y())) && !map.outOfRange(viewX, viewY)) {
 					currentTile = map.getTile(viewX, viewY);
 					List<Vector2i> tileList = tilePositions.get(currentTile);
 					tileList.add(new Vector2i(viewX, viewY));
@@ -59,9 +83,12 @@ public class Entity implements Comparable<Entity> {
 		boolean found = false;
 		TileType reactTile = null;
 
-		List<TileType> priorities = pChromesome.getPriorities();
+		List<TileType> priorities = priorityGene.getValue();
 		for (int i = 0; i < priorities.size(); i++) {
 			reactTile = priorities.get(i);
+			if ((reactTile == TileType.FOOD) && life > hungerGene.getValue()) {
+				continue;
+			}
 			List<Vector2i> priorityPositions = tilePositions.get(reactTile);
 			Collections.shuffle(priorityPositions);
 			for (Vector2i priorityPosition : priorityPositions) {
@@ -76,39 +103,47 @@ public class Entity implements Comparable<Entity> {
 				break;
 			}
 		}
+
+		if (reactPosition == null) {
+			return;
+		}
+
 		Logger.debug("Found Tile: " + found, Category.ENTITIES);
 		Logger.debug("PriorityTile: " + reactTile.toString(), Category.ENTITIES);
 
-		Action action = rChromesome.getReaction(reactTile);
+		Action action = reactionGene.getSmallValue(reactTile);
 		Logger.debug("Reaction: " + action.toString(), Category.ENTITIES);
 		Logger.debug("React Position: " + reactPosition, Category.ENTITIES);
 		Logger.debug("Current Position: " + position, Category.ENTITIES);
 
-		Vector2i tileDirection = new Vector2i(reactPosition.getX() - position.getX(),
-				reactPosition.getY() - position.getY());
+		Vector2i tileDirection = new Vector2i(reactPosition.x() - position.x(), reactPosition.y() - position.y());
 		Logger.debug("Tile Direction: " + tileDirection, Category.ENTITIES);
 
 		Vector2i movementVector = ActionHandler.useAction(action, tileDirection);
 		Logger.debug("Movement Direction: " + movementVector, Category.ENTITIES);
 
-		Vector2i movementPosition = new Vector2i(position.getX() + movementVector.getX(),
-				position.getY() + movementVector.getY());
+		Vector2i movementPosition = new Vector2i(position.x() + movementVector.x(), position.y() + movementVector.y());
 
-		TileType moveTile = map.getTile(movementPosition.getX(), movementPosition.getY());
-
-		life--;
-		fitness++;
+		TileType moveTile = map.getTile(movementPosition.x(), movementPosition.y());
 
 		if (moveTile == TileType.FOOD) {
 			life += FOOD_LIFE;
+			if (life > INITIAL_LIFE) {
+				life = INITIAL_LIFE;
+			}
 		}
 
-		if (moveTile == TileType.EMPTY || moveTile == TileType.FOOD) {
-			map.setTile(position.getX(), position.getY(), TileType.EMPTY);
-			position.setX(movementPosition.getX());
-			position.setY(movementPosition.getY());
-			map.setTile(position.getX(), position.getY(), TileType.ENTITY);
-			Logger.debug(this.toString() + " position: " + position.toString(), Category.ENTITIES);
+		if (moveTile == TileType.ENTITY && aggressionGene.getValue()) {
+			map.killEntity(movementPosition);
+		} else {
+
+			if (moveTile == TileType.EMPTY || moveTile == TileType.FOOD) {
+				map.setTile(position.x(), position.y(), TileType.EMPTY);
+				position.setComponent(0, movementPosition.x());
+				position.setComponent(1, movementPosition.y());
+				map.setTile(position.x(), position.y(), TileType.ENTITY);
+				Logger.debug(this.toString() + " position: " + position.toString(), Category.ENTITIES);
+			}
 		}
 
 		if (life <= 0) {
@@ -120,9 +155,9 @@ public class Entity implements Comparable<Entity> {
 	private Vector2i inSight(TileMap map, Vector2i tilePosition) {
 		List<Vector2i> viewTiles = getTilesOnLine(position, tilePosition);
 		for (Vector2i tile : viewTiles) {
-			Logger.debug("Line of Sight Position: x: " + tile.getX() + ", y: " + tile.getY(), Category.ENTITIES);
-			TileType tileType = map.getTile(tile.getX(), tile.getY());
-			if (!(tile.getX() == position.getX() && tile.getY() == position.getY())
+			Logger.debug("Line of Sight Position: x: " + tile.x() + ", y: " + tile.y(), Category.ENTITIES);
+			TileType tileType = map.getTile(tile.x(), tile.y());
+			if (!(tile.x() == position.x() && tile.y() == position.y())
 					&& (tileType == TileType.WALL || tileType == TileType.ENTITY)) {
 				Logger.debug("Tile Blocked", Category.ENTITIES);
 				return null;
@@ -133,10 +168,10 @@ public class Entity implements Comparable<Entity> {
 
 	private static List<Vector2i> getTilesOnLine(Vector2i start, Vector2i goal) {
 		List<Vector2i> tiles = new ArrayList<>();
-		int x0 = start.getX();
-		int y0 = start.getY();
-		int x1 = goal.getX();
-		int y1 = goal.getY();
+		int x0 = start.x();
+		int y0 = start.y();
+		int x1 = goal.x();
+		int y1 = goal.y();
 
 		int dx = Math.abs(x1 - x0);
 		int dy = Math.abs(y1 - y0);
@@ -169,8 +204,16 @@ public class Entity implements Comparable<Entity> {
 	}
 
 	private void mutate() {
-		pChromesome.mutate();
-		rChromesome.mutate();
+		Random random = new Random();
+
+		if (random.nextFloat() <= MUTATION_RATE)
+			priorityGene.mutate();
+		if (random.nextFloat() <= MUTATION_RATE)
+			reactionGene.mutate();
+		if (random.nextFloat() <= MUTATION_RATE)
+			aggressionGene.mutate();
+		if (random.nextFloat() <= MUTATION_RATE)
+			hungerGene.mutate();
 	}
 
 	public void reset() {
@@ -196,12 +239,24 @@ public class Entity implements Comparable<Entity> {
 		return dead;
 	}
 
-	public PriorityChromesome getPChromesome() {
-		return pChromesome;
+	public OrderGene<TileType> getPriorityChromosome() {
+		return priorityGene;
 	}
 
-	public ReactionChromesome getRChromesome() {
-		return rChromesome;
+	public MapGene<TileType, Action> getReactionsChromosome() {
+		return reactionGene;
+	}
+
+	public BooleanGene getAggressionGene() {
+		return aggressionGene;
+	}
+
+	public IntegerGene getHungerGene() {
+		return hungerGene;
+	}
+
+	public void kill() {
+		dead = true;
 	}
 
 	@Override
@@ -213,5 +268,13 @@ public class Entity implements Comparable<Entity> {
 		} else {
 			return -1;
 		}
+	}
+
+	public void printStats() {
+		Logger.info("Fitness: " + fitness);
+		Logger.info(priorityGene.toString());
+		Logger.info(reactionGene.toString());
+		Logger.info(aggressionGene.toString());
+		Logger.info(hungerGene.toString());
 	}
 }

@@ -1,16 +1,15 @@
 package actions;
 
-import entities.Vector2i;
+import org.joml.Vector2i;
 
-public class ActionHandler {
+public abstract class ActionHandler {
 
-	public static Vector2i useAction(Action action, Vector2i direction){
-		switch(action){
-		case RANDOM:
+	public static Vector2i useAction(Action action, Vector2i direction) {
+		switch (action) {
 		case TOWARDS:
 			return direction;
 		case AWAY:
-			return direction.flip();
+			return direction.negate();
 		default:
 			return new Vector2i(0, 0);
 		}
