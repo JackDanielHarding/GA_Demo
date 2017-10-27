@@ -1,6 +1,9 @@
 
 package map;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import display.Window;
 import entities.Entity;
 import logging.Logger;
@@ -25,9 +28,12 @@ public class Village {
 	private int moveCounter = 0;
 	private static final int MOVE_DELAY = 25;
 
+	private static JSONObject generationJson = new JSONObject();
+
 	public Village(int populationSize, int mapSize, int maxFood) {
 		this.maxFood = maxFood;
 		map = new TileMap(mapSize);
+		generationJson.put("mapSize", mapSize);
 		population = new Population(populationSize);
 	}
 
@@ -69,8 +75,18 @@ public class Village {
 			moveCounter--;
 
 		} else {
+			saveJson();
 			createNextGeneration();
 		}
+	}
+
+	private void saveJson() {
+		JSONArray entityArray = new JSONArray();
+		for (Entity e : population.getEntities()) {
+			entityArray.add(e.getJson());
+		}
+		generationJson.put("entities", entityArray);
+		System.out.println(generationJson);
 	}
 
 	public void createNextGeneration() {

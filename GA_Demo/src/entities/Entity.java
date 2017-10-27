@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Random;
 
 import org.joml.Vector2i;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import actions.Action;
 import actions.ActionHandler;
@@ -34,8 +36,10 @@ public class Entity implements Comparable<Entity> {
 	private int fitness = 0;
 	private int life = INITIAL_LIFE;
 	private boolean dead = false;
+	private List<Vector2i> path;
 
 	public Entity() {
+		path = new ArrayList<>();
 		priorityGene = new OrderGene<>("Priority Gene", TileType.class);
 		reactionGene = new MapGene<>("Reaction Gene", TileType.class, Action.class);
 		aggressionGene = new BooleanGene("Aggression Gene");
@@ -43,6 +47,7 @@ public class Entity implements Comparable<Entity> {
 	}
 
 	public Entity(Entity entity) {
+		path = new ArrayList<>();
 		priorityGene = new OrderGene<>(entity.getPriorityChromosome());
 		reactionGene = new MapGene<>(entity.getReactionsChromosome());
 		aggressionGene = new BooleanGene(entity.getAggressionGene());
@@ -51,6 +56,7 @@ public class Entity implements Comparable<Entity> {
 	}
 
 	public Entity(Entity parent1, Entity parent2) {
+		path = new ArrayList<>();
 		priorityGene = new OrderGene<>(parent1.getPriorityChromosome(), parent2.getPriorityChromosome());
 		reactionGene = new MapGene<>(parent1.getReactionsChromosome(), parent2.getReactionsChromosome());
 		aggressionGene = new BooleanGene(parent1.getAggressionGene(), parent2.getAggressionGene());
@@ -59,7 +65,6 @@ public class Entity implements Comparable<Entity> {
 	}
 
 	public void update(TileMap map) {
-
 		life--;
 		fitness++;
 
@@ -150,6 +155,10 @@ public class Entity implements Comparable<Entity> {
 			dead = true;
 			Logger.debug(this + " Died", Category.ENTITIES);
 		}
+
+		int jsonx = position.x();
+		int jsony = position.y();
+		path.add(new Vector2i(jsonx, jsony));
 	}
 
 	private Vector2i inSight(TileMap map, Vector2i tilePosition) {
@@ -224,6 +233,7 @@ public class Entity implements Comparable<Entity> {
 
 	public void setPosition(Vector2i position) {
 		this.position = position;
+		path.add(position);
 		Logger.debug(this.toString() + " position: " + position.toString(), Category.ENTITIES);
 	}
 
@@ -276,5 +286,24 @@ public class Entity implements Comparable<Entity> {
 		Logger.info(reactionGene.toString());
 		Logger.info(aggressionGene.toString());
 		Logger.info(hungerGene.toString());
+	}
+
+	public JSONObject getJson() {
+		JSONObject json = new JSONObject();
+
+		json.put("priorityGene", priorityGene.getJson());
+		json.put("aggression", aggressionGene.getValue());
+
+		JSONArray pathArray = new JSONArray();
+		for (Vector2i step : path) {
+			JSONArray positionArray = new JSONArray();
+			positionArray.add(step.x());
+			positionArray.add(step.y());
+			pathArray.add(positionArray);
+		}
+
+		json.put("positions", pathArray);
+
+		return json;
 	}
 }

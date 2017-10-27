@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import org.json.simple.JSONArray;
+
 import logging.Logger;
 import logging.Logger.Category;
 
@@ -96,5 +98,15 @@ public class OrderGene<T extends Enum<T>> extends Gene<List<T>> {
 			outputString.append(", " + tile);
 		}
 		return outputString.toString();
+	}
+
+	public JSONArray getJson() {
+		JSONArray orderArray = new JSONArray();
+
+		for (T item : list) {
+			orderArray.add(item.toString());
+		}
+
+		return orderArray;
 	}
 }
